@@ -1,21 +1,24 @@
 #!/bin/bash
 
-# install brew
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-# install zsh, git
-brew install zsh git
-# install oh-my-zsh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-# install node
-brew install node
-# install haskell-language-server
-brew install haskell-language-server
-# install neovim
-brew install neovim
-# install tldr
-brew install tldr
-# install tmux
-brew install tmux
+# mac
+if [ "$(uname)" == "Darwin" ]; then
+  # install brew
+  /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  # install zsh, git
+  brew install zsh git
+  # install oh-my-zsh
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+  # install node
+  brew install node
+  # install haskell-language-server
+  brew install haskell-language-server
+  # install neovim
+  brew install neovim
+  # install tldr
+  brew install tldr
+  # install tmux
+  brew install tmux
+fi
 
 # link zsh config
 ln -sf $(pwd)/.zshrc ~/.zshrc
