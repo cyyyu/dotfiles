@@ -187,6 +187,10 @@ return require("packer").startup(function()
       vim.cmd([[
           " Highlight the symbol and its references when holding the cursor.
           autocmd CursorHold * silent call CocActionAsync("highlight")
+
+          " Use <Tab> and <S-Tab> to navigate the completion list
+          inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+          inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
           
           augroup mygroup
             autocmd!
@@ -204,8 +208,8 @@ return require("packer").startup(function()
           " Add `:Format` command to format current buffer.
           command! -nargs=0 Format :call CocActionAsync("format")
           " Format with prettier
-          command! -nargs=0 Prettier :CocCommand prettier.forceFormatDocument
-          nmap <silent> <leader>p :Prettier<cr>
+          command! -nargs=0 Prettier :CocCommand prettier.formatFile
+          noremap <silent> <leader>p :Prettier<cr>
           " Formatting selected code.
           xmap <leader>p  <Plug>(coc-format-selected)
           nmap <leader>l  <Plug>(coc-format)
