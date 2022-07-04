@@ -6,8 +6,6 @@ if [ "$(uname)" == "Darwin" ]; then
   /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   # install zsh, git
   brew install zsh git
-  # install oh-my-zsh
-  sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
   # install node
   brew install node
   # install haskell-language-server
@@ -18,7 +16,29 @@ if [ "$(uname)" == "Darwin" ]; then
   brew install tldr
   # install tmux
   brew install tmux
+  # install curl
+  brew install curl
 fi
+# linux
+if [ "$(uname)" == "Linux" ]; then
+  # install zsh, git
+  sudo apt-get install zsh git
+  # install node
+  sudo apt-get install node
+  # install haskell-language-server
+  sudo apt-get install haskell-language-server
+  # install neovim
+  sudo apt-get install neovim
+  # install tldr
+  sudo apt-get install tldr
+  # install tmux
+  sudo apt-get install tmux
+  # install curl
+  sudo apt-get install curl
+fi
+
+# install oh-my-zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
 # link zsh config
 ln -sf $(pwd)/.zshrc ~/.zshrc
