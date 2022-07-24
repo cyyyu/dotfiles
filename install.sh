@@ -40,6 +40,12 @@ fi
 # install oh-my-zsh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
+# haskell
+# install stack
+curl -sSL https://get.haskellstack.org/ | sh
+# hindent
+stack install hindent
+
 # link zsh config
 ln -sf $(pwd)/.zshrc ~/.zshrc
 # link tmux config
@@ -76,4 +82,6 @@ then
 fi
 
 ln -sf $(pwd)/nvim.lua $configdir/init.lua
+
+echo "DONE!"
 # done config nvim

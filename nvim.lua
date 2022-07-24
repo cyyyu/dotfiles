@@ -340,6 +340,18 @@ return require("packer").startup(function()
       vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
     end,
   }
+
+  use { 
+    "alx741/vim-hindent",
+    config = function()
+      vim.cmd[[
+        augroup HaskellFormat
+          autocmd!
+          autocmd BufRead,BufNewFile *.hs noremap <silent> <leader>p :Hindent<cr>
+        augroup END
+      ]]
+    end,
+  }
 end)
 
 -- End plugins
