@@ -243,7 +243,7 @@ return require("packer").startup(function()
     config = function()
       require "nvim-tree".setup {
         view = {
-          width = 40,
+          width = 30,
           hide_root_folder = true,
         }
       }
@@ -304,14 +304,18 @@ return require("packer").startup(function()
   }
   use "github/copilot.vim"
   use { "nvim-lualine/lualine.nvim",
-    requires = { "rafi/awesome-vim-colorschemes" },
     config = function()
       require("lualine").setup {
-        options = { theme = "gruvbox" },
+        theme = "auto",
         extensions = { "nvim-tree" },
       }
-      vim.cmd("colorscheme gruvbox")
     end }
+
+  use { "Yazeed1s/minimal.nvim",
+    config = function()
+      vim.cmd[[colorscheme minimal-base16]]
+    end
+  }
 
   use {
     "lewis6991/gitsigns.nvim", requires = { "nvim-lua/plenary.nvim" },
