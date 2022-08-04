@@ -1,40 +1,18 @@
 #!/bin/bash
 
+softwares='zsh git node haskell-language-server neovim tldr tmux curl'
+
 # mac
 if [ "$(uname)" == "Darwin" ]; then
   # install brew
   /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-  # install zsh, git
-  brew install zsh git
-  # install node
-  brew install node
-  # install haskell-language-server
-  brew install haskell-language-server
-  # install neovim
-  brew install neovim
-  # install tldr
-  brew install tldr
-  # install tmux
-  brew install tmux
-  # install curl
-  brew install curl
+  # install everything
+  brew install ${softwares}
 fi
 # linux
 if [ "$(uname)" == "Linux" ]; then
-  # install zsh, git
-  sudo apt-get install zsh git
-  # install node
-  sudo apt-get install node
-  # install haskell-language-server
-  sudo apt-get install haskell-language-server
-  # install neovim
-  sudo apt-get install neovim
-  # install tldr
-  sudo apt-get install tldr
-  # install tmux
-  sudo apt-get install tmux
-  # install curl
-  sudo apt-get install curl
+  # install everything
+  sudo apt-get ${softwares}
 fi
 
 # install oh-my-zsh
