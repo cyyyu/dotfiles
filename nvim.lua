@@ -188,10 +188,6 @@ return require("packer").startup(function()
           " Highlight the symbol and its references when holding the cursor.
           autocmd CursorHold * silent call CocActionAsync("highlight")
 
-          " Use <Tab> and <S-Tab> to navigate the completion list
-          inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-          inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-          
           augroup mygroup
             autocmd!
             " Setup formatexpr specified filetype(s).
