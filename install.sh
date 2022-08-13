@@ -35,6 +35,8 @@ if [ "$action" == "softwares" ]; then
     curl -sSL https://get.haskellstack.org/ | sh
     # hindent
     stack install hindent
+    # ghcup
+    curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
 fi
 
 # setup dotfiles

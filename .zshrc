@@ -20,3 +20,4 @@ alias v=nvim
 
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden'
 
+[ -f "/Users/chuangyu/.ghcup/env" ] && source "/Users/chuangyu/.ghcup/env" # ghcup-env
