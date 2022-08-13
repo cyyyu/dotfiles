@@ -101,9 +101,6 @@ nnoremap <silent> <leader>2 :resize +12<cr>
 nnoremap <silent> <leader>3 :vertical resize -6<cr> 
 nnoremap <silent> <leader>4 :vertical resize +6<cr> 
 
-" Set the filetype for tsx
-au BufRead,BufNewFile *.tsx set filetype=typescript
-
 " To reload file
 map <silent> <leader>r :checktime<CR>
 
@@ -166,76 +163,13 @@ endfunction
 -- End general configs
 
 -- Plugins
-
 local use = require("packer").use
-return require("packer").startup(function()
+require("packer").startup(function()
   use "wbthomason/packer.nvim"
 
   use {
-    "neoclide/coc.nvim",
-    branch = "release",
-    config = function()
-      vim.o.shortmess = vim.o.shortmess .. "c"
-      -- Use `[g` and `]g` to navigate diagnostics
-      vim.keymap.set("n", "[g", "<Plug>(coc-diagnostic-prev)", { noremap = true, silent = true })
-      vim.keymap.set("n", "]g", "<Plug>(coc-diagnostic-next)", { noremap = true, silent = true })
-      -- GoTo code navigation.
-      vim.keymap.set("n", "gd", "<Plug>(coc-definition)", { silent = true })
-      vim.keymap.set("n", "gy", "<Plug>(coc-type-definition)", { silent = true })
-      vim.keymap.set("n", "gi", "<Plug>(coc-implementation)", { silent = true })
-      vim.keymap.set("n", "gr", "<Plug>(coc-references)", { silent = true })
-      vim.cmd([[
-          " Highlight the symbol and its references when holding the cursor.
-          autocmd CursorHold * silent call CocActionAsync("highlight")
-
-          augroup mygroup
-            autocmd!
-            " Setup formatexpr specified filetype(s).
-            autocmd FileType typescript,json setl formatexpr=CocActionAsync("formatSelected")
-            " Update signature help on jump placeholder.
-            autocmd User CocJumpPlaceholder call CocActionAsync("showSignatureHelp")
-          augroup end
-          
-          " Use CTRL-S for selections ranges.
-          " Requires "textDocument/selectionRange" support of language server.
-          nmap <silent> <C-s> <Plug>(coc-range-select)
-          xmap <silent> <C-s> <Plug>(coc-range-select)
-          
-          " Add `:Format` command to format current buffer.
-          command! -nargs=0 Format :call CocActionAsync("format")
-          " Format with prettier
-          command! -nargs=0 Prettier :CocCommand prettier.formatFile
-          noremap <silent> <leader>p :Prettier<cr>
-          " Formatting selected code.
-          xmap <leader>p  <Plug>(coc-format-selected)
-          nmap <leader>l  <Plug>(coc-format)
-          
-          " Add `:OR` command for organize imports of the current buffer.
-          command! -nargs=0 OR   :call     CocActionAsync("runCommand", "editor.action.organizeImport")
-
-          " "K" to show doc
-          nnoremap <silent> K :call Show_documentation()<CR>
-          function! Show_documentation()
-            if CocAction("hasProvider", "hover")
-                call CocActionAsync("doHover")
-                  else
-            call feedkeys("K", "in")
-              endif
-          endfunction
-
-          nnoremap <nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
-          nnoremap <nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
-          inoremap <nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
-          inoremap <nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
-       ]])
-    end
-  }
-
-  use {
     "kyazdani42/nvim-tree.lua",
-    requires = {
-      "kyazdani42/nvim-web-devicons",
-    },
+    requires = "kyazdani42/nvim-web-devicons",
     config = function()
       require "nvim-tree".setup {
         view = {
@@ -251,7 +185,7 @@ return require("packer").startup(function()
   use "mattn/emmet-vim"
   use "scrooloose/nerdcommenter"
   use "sheerun/vim-polyglot"
-  use { "windwp/nvim-autopairs", config = function ()
+  use { "windwp/nvim-autopairs", config = function()
     require("nvim-autopairs").setup()
   end }
   use "yuttie/comfortable-motion.vim"
@@ -309,7 +243,7 @@ return require("packer").startup(function()
 
   use { "Yazeed1s/minimal.nvim",
     config = function()
-      vim.cmd[[colorscheme minimal-base16]]
+      vim.cmd [[colorscheme minimal-base16]]
     end
   }
 
@@ -328,7 +262,6 @@ return require("packer").startup(function()
           "javascript",
           "typescript",
           "lua",
-          "rust",
           "haskell"
         },
         sync_install = false,
@@ -341,10 +274,10 @@ return require("packer").startup(function()
     end,
   }
 
-  use { 
+  use {
     "alx741/vim-hindent",
     config = function()
-      vim.cmd[[
+      vim.cmd [[
         augroup HaskellFormat
           autocmd!
           autocmd BufRead,BufNewFile *.hs noremap <silent> <leader>p :Hindent<cr>
@@ -352,6 +285,139 @@ return require("packer").startup(function()
       ]]
     end,
   }
-end)
 
+  -- LSP configs
+  -- LSP keybindings
+  vim.api.nvim_create_autocmd("User", {
+    pattern = "LspAttached",
+    desc = "LSP actions",
+    callback = function()
+      local bufmap = function(mode, lhs, rhs)
+        local bufopts = { noremap = true, buffer = true }
+        vim.keymap.set(mode, lhs, rhs, bufopts)
+      end
+
+      bufmap("n", "gD", vim.lsp.buf.declaration)
+      bufmap("n", "gd", vim.lsp.buf.definition)
+      bufmap("n", "gi", vim.lsp.buf.implementation)
+      bufmap("n", "gr", vim.lsp.buf.references)
+      bufmap("n", "K", vim.lsp.buf.hover)
+      bufmap("n", "<leader>p", vim.lsp.buf.formatting)
+      bufmap("n", "gl", vim.diagnostic.open_float)
+      bufmap("n", "[d", vim.diagnostic.goto_prev)
+      bufmap("n", "]d", vim.diagnostic.goto_next)
+      bufmap("n", "go", vim.lsp.buf.type_definition)
+    end
+  })
+
+  use "williamboman/mason.nvim"
+  use {
+    "williamboman/mason-lspconfig.nvim",
+    after = "mason.nvim",
+    config = function()
+      require("mason").setup()
+      require("mason-lspconfig").setup()
+    end
+  }
+  use {
+    "neovim/nvim-lspconfig",
+    after = { "mason-lspconfig.nvim" },
+    config = function()
+      local lsp_defaults = {
+        on_attach = function(client, bufnr)
+          vim.api.nvim_exec_autocmds("User", { pattern = "LspAttached" })
+        end,
+      }
+
+      -- Extend to defaults
+      local lspconfig = require("lspconfig")
+      lspconfig.util.default_config = vim.tbl_deep_extend(
+        "force",
+        lspconfig.util.default_config,
+        lsp_defaults
+      )
+
+    end
+  }
+
+  use "hrsh7th/cmp-nvim-lsp"
+  use "hrsh7th/cmp-buffer"
+  use "hrsh7th/cmp-path"
+  use "hrsh7th/cmp-cmdline"
+  use "hrsh7th/cmp-vsnip"
+  use "hrsh7th/vim-vsnip"
+  use {
+    "hrsh7th/nvim-cmp",
+    requires = { "neovim/nvim-lspconfig", "hrsh7th/cmp-nvim-lsp", "harsh7th/cmp-buffer", "hrsh7th/cmp-path",
+      "hrsh7th/cmp-cmdline", "hrsh7th/cmp-vsnip", "hrsh7th/vim-vsnip" },
+    after = { "nvim-lspconfig" },
+    config = function()
+      vim.cmd [[set completeopt=menu,menuone,noselect]]
+
+      local cmp = require "cmp"
+
+      cmp.setup({
+        snippet = {
+          -- REQUIRED - you must specify a snippet engine
+          expand = function(args)
+            vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+          end,
+        },
+        mapping = cmp.mapping.preset.insert({
+          ["<C-u>"] = cmp.mapping.scroll_docs(-4),
+          ["<C-d>"] = cmp.mapping.scroll_docs(4),
+          ["<C-Space>"] = cmp.mapping.complete(),
+          ["<C-e>"] = cmp.mapping.abort(),
+          ["<CR>"] = cmp.mapping.confirm({ select = true }),
+        }),
+        sources = cmp.config.sources({
+          { name = "nvim_lsp" },
+          { name = "vsnip" },
+        }, {
+          { name = "buffer" },
+        })
+      })
+
+      -- Use buffer source for `/` (if you enabled `native_menu`, this won"t work anymore).
+      cmp.setup.cmdline("/", {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = {
+          { name = "buffer" }
+        }
+      })
+
+      -- Use cmdline & path source for ":" (if you enabled `native_menu`, this won"t work anymore).
+      cmp.setup.cmdline(":", {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = cmp.config.sources({
+          { name = "path" }
+        }, {
+          { name = "cmdline" }
+        })
+      })
+
+      -- Setup lspconfig.
+      local lsp_servers = { "tsserver", "hls" }
+      local lspconfig = require("lspconfig")
+      local capabilities = require("cmp_nvim_lsp").update_capabilities(vim.lsp.protocol.make_client_capabilities())
+      for _, lsp in ipairs(lsp_servers) do
+        lspconfig[lsp].setup {
+          capabilities = capabilities,
+        }
+      end
+      lspconfig.sumneko_lua.setup {
+        capabilities = capabilities,
+        settings = {
+          Lua = {
+            diagnostics = {
+              globals = { "vim" }
+            },
+          },
+        },
+      }
+    end
+  }
+  -- End LSP configs
+
+end)
 -- End plugins
