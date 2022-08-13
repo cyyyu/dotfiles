@@ -243,7 +243,7 @@ require("packer").startup(function()
 
   use { "Yazeed1s/minimal.nvim",
     config = function()
-      vim.cmd [[colorscheme minimal-base16]]
+      vim.cmd [[colorscheme minimal]]
     end
   }
 
