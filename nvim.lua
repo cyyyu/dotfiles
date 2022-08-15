@@ -35,18 +35,16 @@ vim.o.cmdheight = 2
 vim.cmd [[
   set undodir=~/.vim_undo
   set undofile
-]]
 
-vim.cmd [[
   " Correct jsx/tsx filetype
   augroup ReactFiletypes
     autocmd!
     autocmd BufRead,BufNewFile *.jsx set filetype=javascriptreact
     autocmd BufRead,BufNewFile *.tsx set filetype=typescriptreact
   augroup END
-]]
 
-vim.keymap.set("n", "<leader>w", "<cmd>w!<CR>")
+  colorscheme murphy
+]]
 
 vim.cmd [[
 filetype plugin indent on
@@ -160,6 +158,8 @@ function! VisualSelection(direction, extra_filter) range
 endfunction
 ]]
 
+vim.keymap.set("n", "<leader>w", "<cmd>w!<CR>")
+
 -- End general configs
 
 -- Plugins
@@ -240,12 +240,6 @@ require("packer").startup(function()
         extensions = { "nvim-tree" },
       }
     end }
-
-  use { "Yazeed1s/minimal.nvim",
-    config = function()
-      vim.cmd [[colorscheme minimal]]
-    end
-  }
 
   use {
     "lewis6991/gitsigns.nvim", requires = { "nvim-lua/plenary.nvim" },
