@@ -42,8 +42,6 @@ vim.cmd [[
     autocmd BufRead,BufNewFile *.jsx set filetype=javascriptreact
     autocmd BufRead,BufNewFile *.tsx set filetype=typescriptreact
   augroup END
-
-  colorscheme murphy
 ]]
 
 vim.cmd [[
@@ -166,6 +164,14 @@ vim.keymap.set("n", "<leader>w", "<cmd>w!<CR>")
 local use = require("packer").use
 require("packer").startup(function()
   use "wbthomason/packer.nvim"
+
+  use {
+    "projekt0n/github-nvim-theme",
+    config = function()
+      require("github-theme").setup()
+      vim.cmd [[colorscheme github_dark_default]]
+    end,
+  }
 
   use {
     "kyazdani42/nvim-tree.lua",
