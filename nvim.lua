@@ -280,7 +280,7 @@ require("packer").startup(function()
       vim.cmd [[
         augroup HaskellFormat
           autocmd!
-          autocmd BufRead,BufNewFile *.hs noremap <silent> <leader>p :Hindent<cr>
+          autocmd BufRead,BufNewFile *.hs noremap <silent> <leader>l :Hindent<cr>
         augroup END
       ]]
     end,
@@ -302,7 +302,7 @@ require("packer").startup(function()
       bufmap("n", "gi", vim.lsp.buf.implementation)
       bufmap("n", "gr", vim.lsp.buf.references)
       bufmap("n", "K", vim.lsp.buf.hover)
-      bufmap("n", "<leader>p", function()
+      bufmap("n", "<leader>l", function()
         vim.lsp.buf.format { async = true }
       end)
       bufmap("n", "gl", vim.diagnostic.open_float)
