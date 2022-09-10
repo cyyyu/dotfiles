@@ -49,7 +49,12 @@ if [ "$action" == "dotfiles" ]; then
   ln -sf $(pwd)/.tmux.conf ~/.tmux.conf
   # link wezterm config
   ln -sf $(pwd)/.wezterm.lua ~/.wezterm.lua
-  
+
+  # link if not exists
+  if [ ! -f ~/.npmrc ]; then
+    ln -sf $(pwd)/.npmrc ~/.npmrc
+  fi
+
   # config nvim stuff
   if [ ! -d "$HOME/.local/share/nvim/site/pack/packer/start/packer.nvim" ]
   then
