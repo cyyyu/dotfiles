@@ -73,8 +73,6 @@ nmap <silent> <A-]> :tabnext<cr>
 
 map <leader>c :Bclose<cr>:tabclose<cr>gT
 
-nmap <leader>b :Buffers<cr>
-
 map <leader>tn :tabnew<cr>
 map <leader>to :tabonly<cr>
 map <leader>tc :tabclose<cr>
@@ -201,11 +199,30 @@ require("packer").startup(function()
   end }
 
   -- fzf
-  -- https://github.com/junegunn/fzf.vim
-  use { "junegunn/fzf", run = ":call fzf#install()" }
-  use { "junegunn/fzf.vim", config = function()
-    vim.keymap.set("n", "<leader>f", "<cmd>call fzf#run(fzf#wrap({\"source\": \"rg --files --hidden\"}))<cr>")
-  end }
+  use { "junegunn/fzf", run = "./install --bin", }
+  use { "ibhagwan/fzf-lua",
+    requires = { "kyazdani42/nvim-web-devicons" },
+    config = function()
+      require("fzf-lua").setup {
+        fzf_layout = "reverse",
+        fzf_preview_window = "right:60%",
+        fzf_colors = {
+          ["fg+"] = { "fg", "Normal" },
+          ["bg+"] = { "bg", "Normal" },
+          ["hl+"] = { "fg", "Comment" },
+          ["fg"] = { "fg", "Normal" },
+          ["bg"] = { "bg", "Normal" },
+          ["hl"] = { "fg", "Comment" },
+        },
+      }
+      vim.keymap.set("n", "<leader>f", "<cmd>FzfLua files<CR>",
+        { noremap = true, silent = true })
+      vim.keymap.set("n", "<leader>b", "<cmd>FzfLua buffers<CR>",
+        { noremap = true, silent = true })
+      vim.keymap.set("n", "<leader>g", "<cmd>FzfLua grep<CR>",
+        { noremap = true, silent = true })
+    end
+  }
 
   use { "skywind3000/asyncrun.vim", config = function()
     vim.g.asyncrun_open = 16
@@ -215,16 +232,6 @@ require("packer").startup(function()
     vim.keymap.set("n", "<cr>", "<cmd>call asyncrun#quickfix_toggle(16)<cr>", { noremap = false })
   end }
 
-  use {
-    "jremmen/vim-ripgrep",
-    config = function()
-      vim.cmd("map <leader>g :Rg -i ")
-      vim.g.rg_highlight = 1
-      vim.keymap.set("n", "<leader>qn", "<cmd>cn<cr>")
-      vim.keymap.set("n", "<leader>qp", "<cmd>cp<cr>")
-      vim.keymap.set("n", "<leader>qo", "<cmd>.cc<cr>")
-    end
-  }
   use {
     "zivyangll/git-blame.vim",
     config = function()
@@ -326,7 +333,7 @@ require("packer").startup(function()
     after = { "mason-lspconfig.nvim" },
     config = function()
       local lsp_defaults = {
-        on_attach = function(client, bufnr)
+        on_attach = function()
           vim.api.nvim_exec_autocmds("User", { pattern = "LspAttached" })
         end,
       }
