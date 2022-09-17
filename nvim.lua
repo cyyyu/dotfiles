@@ -68,8 +68,8 @@ map <C-k> <C-W>k
 map <C-h> <C-W>h
 map <C-l> <C-W>l
 
-nmap <silent> <A-[> :tabprev<cr>
-nmap <silent> <A-]> :tabnext<cr>
+nmap <silent> <leader>[ :tabprevious<cr>
+nmap <silent> <leader>] :tabnext<cr>
 
 map <leader>c :Bclose<cr>:tabclose<cr>gT
 
