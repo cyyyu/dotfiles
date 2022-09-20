@@ -227,7 +227,6 @@ require("packer").startup(function()
   use { "skywind3000/asyncrun.vim", config = function()
     vim.g.asyncrun_open = 16
     vim.g.asyncrun_bell = 1
-    vim.keymap.set("n", "<leader>a", "<cmd>AsyncRun ")
     vim.keymap.set("n", "<leader>as", "<cmd>AsyncStop<cr>")
     vim.keymap.set("n", "<cr>", "<cmd>call asyncrun#quickfix_toggle(16)<cr>", { noremap = false })
   end }
