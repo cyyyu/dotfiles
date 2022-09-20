@@ -244,7 +244,17 @@ require("packer").startup(function()
       vim.cmd("autocmd! BufNewFile,BufRead *.vs,*.fs set ft=glsl")
     end
   }
-  use "github/copilot.vim"
+  use {
+    "github/copilot.vim",
+    config = function()
+      vim.cmd [[
+        let g:copilot_filetypes = {
+          \ 'yaml': v:true,
+          \ }
+      ]]
+    end
+  }
+
   use { "nvim-lualine/lualine.nvim",
     config = function()
       require("lualine").setup {
