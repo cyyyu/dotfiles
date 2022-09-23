@@ -437,5 +437,21 @@ require("packer").startup(function()
   }
   -- End LSP configs
 
+  use {
+    "nguyenvukhang/nvim-toggler",
+    config = function()
+      require("nvim-toggler").setup({
+        inverses = {
+          ["==="] = "!==",
+          ["<"] = ">",
+          ["<="] = ">=",
+          ["&&"] = "||",
+          ["+"] = "-",
+          ["*"] = "/",
+        }
+      })
+    end
+  }
+
 end)
 -- End plugins
