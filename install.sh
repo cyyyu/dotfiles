@@ -1,6 +1,8 @@
 #!/bin/bash
 
 action="$1"
+isMac=`uname -a | grep Darwin`
+isLinux=`uname -a | grep Linux`
 
 # assert action
 if [ -z "$action" ]; then
@@ -10,33 +12,45 @@ fi
 
 # setup softwares
 if [ "$action" == "softwares" ]; then
-    echo "Installing softwares"
+    declare -a softwares=("zsh" "git" "node" "haskell-language-server" "neovim" "tldr" "tmux" "curl")
 
-    softwares='zsh git node haskell-language-server neovim tldr tmux curl'
-    
-    # mac
-    if [ "$(uname)" == "Darwin" ]; then
-      # install brew
-      /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-      # install everything
-      brew install ${softwares}
-    fi
-    # linux
-    if [ "$(uname)" == "Linux" ]; then
-      # install everything
-      sudo apt-get ${softwares}
+    # install homebrew if not exists on mac
+    if [ ! -z "$isMac" ] && [ ! -x "$(command -v brew)" ]; then
+        echo "Installing homebrew..."
+        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     fi
 
-    # install oh-my-zsh
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+    for software in "${softwares[@]}"; do
+      # check if software is installed
+      if ! command -v $software &> /dev/null; then
+        echo "Installing $software"
+        if [ ! -z "$isMac" ]; then
+          brew install $software
+        elif [ ! -z "$isLinux" ]; then
+          sudo apt install $software
+        fi
+      fi
+    done
+
+    # install oh-my-zsh if not exists
+    if [ ! -d "$HOME/.oh-my-zsh" ]; then
+      echo "Installing oh-my-zsh"
+      sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+    fi
     
     # haskell
-    # install stack
-    curl -sSL https://get.haskellstack.org/ | sh
-    # hindent
-    stack install hindent
-    # ghcup
-    curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
+    # install stack if not exists
+    if [ ! -x "$(command -v stack)" ]; then
+      echo "Installing stack"
+      curl -sSL https://get.haskellstack.org/ | sh
+      # install hindent for haskell code formatting
+      stack install hindent
+    fi
+    # install ghcup if not exists
+    if [ ! -x "$(command -v ghcup)" ]; then
+      echo "Installing ghcup"
+      curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
+    fi
 fi
 
 # setup dotfiles
