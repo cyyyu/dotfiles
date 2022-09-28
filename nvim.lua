@@ -200,46 +200,10 @@ require("packer").startup(function()
     require("indent_blankline").setup {}
   end }
 
-  -- fzf
-  use { "junegunn/fzf", run = ":call fzf#install()", }
-  -- fzf for unix
-  use { "ibhagwan/fzf-lua",
-    requires = { "kyazdani42/nvim-web-devicons" },
-    cond = function()
-      return vim.fn.has("win32") == 0
-    end,
-    config = function()
-      require("fzf-lua").setup {
-        winopts = {
-          preview = {
-            default = "bat",
-            wrap = "wrap",
-          },
-        },
-        previewers = {
-          bat = {
-            cmd    = "bat",
-            args   = "--style=numbers,changes --color always",
-            theme  = 'Coldark-Dark', -- bat preview theme (bat --list-themes)
-            config = nil, -- nil uses $BAT_CONFIG_PATH
-          },
-        }
-      }
-      vim.keymap.set("n", "<leader>f", "<cmd>lua require('fzf-lua').fzf_exec('rg --files')<CR>",
-        { noremap = true, silent = true })
-      vim.keymap.set("n", "<leader>b", "<cmd>FzfLua buffers<CR>",
-        { noremap = true, silent = true })
-      vim.keymap.set("n", "<leader>g", "<cmd>FzfLua grep<CR>",
-        { noremap = true, silent = true })
-    end
-  }
-  -- telescope for win
+  -- telescope
   use {
     "nvim-telescope/telescope.nvim", tag = "0.1.0",
     requires = { { "nvim-lua/plenary.nvim" } },
-    cond = function()
-      return vim.fn.has("win32") == 1
-    end,
     config = function()
       require("telescope").setup {
         defaults = {
