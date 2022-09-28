@@ -204,18 +204,22 @@ require("packer").startup(function()
     requires = { "kyazdani42/nvim-web-devicons" },
     config = function()
       require("fzf-lua").setup {
-        fzf_layout = "reverse",
-        fzf_preview_window = "right:60%",
-        fzf_colors = {
-          ["fg+"] = { "fg", "Normal" },
-          ["bg+"] = { "bg", "Normal" },
-          ["hl+"] = { "fg", "Comment" },
-          ["fg"] = { "fg", "Normal" },
-          ["bg"] = { "bg", "Normal" },
-          ["hl"] = { "fg", "Comment" },
+        winopts = {
+          preview = {
+            default = "bat",
+            wrap = "wrap",
+          },
         },
+        previewers = {
+          bat = {
+            cmd    = "bat",
+            args   = "--style=numbers,changes --color always",
+            theme  = 'Coldark-Dark', -- bat preview theme (bat --list-themes)
+            config = nil, -- nil uses $BAT_CONFIG_PATH
+          },
+        }
       }
-      vim.keymap.set("n", "<leader>f", "<cmd>FzfLua files<CR>",
+      vim.keymap.set("n", "<leader>f", "<cmd>lua require('fzf-lua').fzf_exec('rg --files')<CR>",
         { noremap = true, silent = true })
       vim.keymap.set("n", "<leader>b", "<cmd>FzfLua buffers<CR>",
         { noremap = true, silent = true })
@@ -304,60 +308,6 @@ require("packer").startup(function()
 
   -- LSP configs
   -- LSP keybindings
-  vim.api.nvim_create_autocmd("User", {
-    pattern = "LspAttached",
-    desc = "LSP actions",
-    callback = function()
-      local bufmap = function(mode, lhs, rhs)
-        local bufopts = { noremap = true, buffer = true }
-        vim.keymap.set(mode, lhs, rhs, bufopts)
-      end
-
-      bufmap("n", "gD", vim.lsp.buf.declaration)
-      bufmap("n", "gd", vim.lsp.buf.definition)
-      bufmap("n", "gi", vim.lsp.buf.implementation)
-      bufmap("n", "gr", vim.lsp.buf.references)
-      bufmap("n", "K", vim.lsp.buf.hover)
-      bufmap("n", "<leader>l", function()
-        vim.lsp.buf.format { async = true }
-      end)
-      bufmap("n", "gl", vim.diagnostic.open_float)
-      bufmap("n", "[d", vim.diagnostic.goto_prev)
-      bufmap("n", "]d", vim.diagnostic.goto_next)
-      bufmap("n", "go", vim.lsp.buf.type_definition)
-    end
-  })
-
-  use "williamboman/mason.nvim"
-  use {
-    "williamboman/mason-lspconfig.nvim",
-    after = "mason.nvim",
-    config = function()
-      require("mason").setup()
-      require("mason-lspconfig").setup()
-    end
-  }
-  use {
-    "neovim/nvim-lspconfig",
-    after = { "mason-lspconfig.nvim" },
-    config = function()
-      local lsp_defaults = {
-        on_attach = function()
-          vim.api.nvim_exec_autocmds("User", { pattern = "LspAttached" })
-        end,
-      }
-
-      -- Extend to defaults
-      local lspconfig = require("lspconfig")
-      lspconfig.util.default_config = vim.tbl_deep_extend(
-        "force",
-        lspconfig.util.default_config,
-        lsp_defaults
-      )
-
-    end
-  }
-
   use "hrsh7th/cmp-nvim-lsp"
   use "hrsh7th/cmp-buffer"
   use "hrsh7th/cmp-path"
@@ -415,24 +365,39 @@ require("packer").startup(function()
       })
 
       -- Setup lspconfig.
-      local lsp_servers = { "tsserver", "hls" }
-      local lspconfig = require("lspconfig")
-      local capabilities = require("cmp_nvim_lsp").update_capabilities(vim.lsp.protocol.make_client_capabilities())
-      for _, lsp in ipairs(lsp_servers) do
-        lspconfig[lsp].setup {
-          capabilities = capabilities,
-        }
-      end
-      lspconfig.sumneko_lua.setup {
-        capabilities = capabilities,
-        settings = {
-          Lua = {
-            diagnostics = {
-              globals = { "vim" }
-            },
-          },
+      --require("cmp_nvim_lsp").update_capabilities(vim.lsp.protocol.make_client_capabilities())
+    end
+  }
+
+  use {
+    "junnplus/lsp-setup.nvim",
+    requires = {
+      "neovim/nvim-lspconfig",
+      "williamboman/mason.nvim",
+      "williamboman/mason-lspconfig.nvim",
+    },
+    config = function()
+      require("lsp-setup").setup({
+        default_mappings = true,
+        mappings = {
+          ["<leader>rn"] = "lua vim.lsp.buf.rename()",
+          ["<leader>ca"] = "lua vim.lsp.buf.code_action()",
+          ["<leader>l"] = "lua vim.lsp.buf.format({ async = true })",
         },
-      }
+        capabilities = vim.lsp.protocol.make_client_capabilities(),
+        servers = {
+          sumneko_lua = {
+            settings = {
+
+              Lua = {
+                diagnostics = {
+                  globals = { "vim" }
+                },
+              },
+            }
+          }
+        }
+      })
     end
   }
   -- End LSP configs
