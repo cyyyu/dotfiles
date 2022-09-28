@@ -77,6 +77,8 @@ map <leader>tn :tabnew<cr>
 map <leader>to :tabonly<cr>
 map <leader>tc :tabclose<cr>
 
+map <leader>qn :cn<cr>
+
 " Return to last edit position when opening files
 au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 
@@ -339,15 +341,51 @@ require("packer").startup(function()
 
   -- LSP configs
   -- LSP keybindings
-  use "hrsh7th/cmp-nvim-lsp"
-  use "hrsh7th/cmp-buffer"
-  use "hrsh7th/cmp-path"
-  use "hrsh7th/cmp-cmdline"
-  use "hrsh7th/cmp-vsnip"
-  use "hrsh7th/vim-vsnip"
+  use {
+    "junnplus/lsp-setup.nvim",
+    requires = {
+      "neovim/nvim-lspconfig",
+      "williamboman/mason.nvim",
+      "williamboman/mason-lspconfig.nvim",
+    },
+    config = function()
+      require("lsp-setup").setup({
+        default_mappings = false,
+        mappings = {
+          gD = "lua vim.lsp.buf.declaration()",
+          gd = "lua vim.lsp.buf.definition()",
+          gi = "lua vim.lsp.buf.implementation()",
+          gr = "lua vim.lsp.buf.references()",
+          K = "lua vim.lsp.buf.hover()",
+          ["<C-k>"] = "lua vim.lsp.buf.signature_help()",
+          ["[d"] = "lua vim.diagnostic.goto_prev()",
+          ["]d"] = "lua vim.diagnostic.goto_next()",
+          ["<leader>rn"] = "lua vim.lsp.buf.rename()",
+          ["<leader>ca"] = "lua vim.lsp.buf.code_action()",
+          ["<leader>l"] = "lua vim.lsp.buf.format({ async = true })",
+          ["<leader>e"] = "lua vim.diagnostic.open_float()",
+        },
+        capabilities = vim.lsp.protocol.make_client_capabilities(),
+        servers = {
+          sumneko_lua = {
+            settings = {
+              Lua = {
+                diagnostics = {
+                  globals = { "vim" }
+                },
+              },
+            }
+          },
+          tsserver = {},
+          hls = {},
+        }
+      })
+    end
+  }
+
   use {
     "hrsh7th/nvim-cmp",
-    requires = { "neovim/nvim-lspconfig", "hrsh7th/cmp-nvim-lsp", "harsh7th/cmp-buffer", "hrsh7th/cmp-path",
+    requires = { "neovim/nvim-lspconfig", "hrsh7th/cmp-nvim-lsp", "hrsh7th/cmp-buffer", "hrsh7th/cmp-path",
       "hrsh7th/cmp-cmdline", "hrsh7th/cmp-vsnip", "hrsh7th/vim-vsnip" },
     after = { "nvim-lspconfig" },
     config = function()
@@ -365,9 +403,8 @@ require("packer").startup(function()
         mapping = cmp.mapping.preset.insert({
           ["<C-u>"] = cmp.mapping.scroll_docs(-4),
           ["<C-d>"] = cmp.mapping.scroll_docs(4),
-          ["<C-Space>"] = cmp.mapping.complete(),
           ["<C-e>"] = cmp.mapping.abort(),
-          -- ["<CR>"] = cmp.mapping.confirm({ select = true }),
+          ["<C-l>"] = cmp.mapping.confirm({ select = true }),
         }),
         sources = cmp.config.sources({
           { name = "nvim_lsp" },
@@ -393,38 +430,6 @@ require("packer").startup(function()
         }, {
           { name = "cmdline" }
         })
-      })
-    end
-  }
-
-  use {
-    "junnplus/lsp-setup.nvim",
-    requires = {
-      "neovim/nvim-lspconfig",
-      "williamboman/mason.nvim",
-      "williamboman/mason-lspconfig.nvim",
-    },
-    config = function()
-      require("lsp-setup").setup({
-        default_mappings = true,
-        mappings = {
-          ["<leader>rn"] = "lua vim.lsp.buf.rename()",
-          ["<leader>ca"] = "lua vim.lsp.buf.code_action()",
-          ["<leader>l"] = "lua vim.lsp.buf.format({ async = true })",
-        },
-        capabilities = vim.lsp.protocol.make_client_capabilities(),
-        servers = {
-          sumneko_lua = {
-            settings = {
-
-              Lua = {
-                diagnostics = {
-                  globals = { "vim" }
-                },
-              },
-            }
-          }
-        }
       })
     end
   }
