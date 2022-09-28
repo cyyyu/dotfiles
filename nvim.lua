@@ -199,9 +199,13 @@ require("packer").startup(function()
   end }
 
   -- fzf
-  use { "junegunn/fzf", run = "./install --bin", }
+  use { "junegunn/fzf", run = ":call fzf#install()", }
+  -- fzf for unix
   use { "ibhagwan/fzf-lua",
     requires = { "kyazdani42/nvim-web-devicons" },
+    cond = function()
+      return vim.fn.has("win32") == 0
+    end,
     config = function()
       require("fzf-lua").setup {
         winopts = {
@@ -224,6 +228,33 @@ require("packer").startup(function()
       vim.keymap.set("n", "<leader>b", "<cmd>FzfLua buffers<CR>",
         { noremap = true, silent = true })
       vim.keymap.set("n", "<leader>g", "<cmd>FzfLua grep<CR>",
+        { noremap = true, silent = true })
+    end
+  }
+  -- telescope for win
+  use {
+    "nvim-telescope/telescope.nvim", tag = "0.1.0",
+    requires = { { "nvim-lua/plenary.nvim" } },
+    cond = function()
+      return vim.fn.has("win32") == 1
+    end,
+    config = function()
+      require("telescope").setup {
+        defaults = {
+          file_ignore_patterns = { "node_modules" },
+          mappings = {
+            i = {
+              ["<C-j>"] = require("telescope.actions").move_selection_next,
+              ["<C-k>"] = require("telescope.actions").move_selection_previous,
+            },
+          },
+        },
+      }
+      vim.keymap.set("n", "<leader>f", "<cmd>Telescope find_files<CR>",
+        { noremap = true, silent = true })
+      vim.keymap.set("n", "<leader>b", "<cmd>Telescope buffers<CR>",
+        { noremap = true, silent = true })
+      vim.keymap.set("n", "<leader>g", "<cmd>Telescope live_grep<CR>",
         { noremap = true, silent = true })
     end
   }
@@ -363,9 +394,6 @@ require("packer").startup(function()
           { name = "cmdline" }
         })
       })
-
-      -- Setup lspconfig.
-      --require("cmp_nvim_lsp").update_capabilities(vim.lsp.protocol.make_client_capabilities())
     end
   }
 
