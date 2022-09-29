@@ -32,6 +32,10 @@ vim.o.cc = 80
 vim.o.signcolumn = "yes"
 vim.o.cmdheight = 2
 
+-- disable netrw and use nvim-tree instead
+vim.g.loaded = 1
+vim.g.loaded_netrwPlugin = 1
+
 vim.cmd [[
   set undodir=~/.vim_undo
   set undofile
@@ -42,118 +46,116 @@ vim.cmd [[
     autocmd BufRead,BufNewFile *.jsx set filetype=javascriptreact
     autocmd BufRead,BufNewFile *.tsx set filetype=typescriptreact
   augroup END
-]]
 
-vim.cmd [[
-filetype plugin indent on
-command W w !sudo tee % > /dev/null
-
-syntax enable 
-
-cnoremap <C-a> <Home>
-cnoremap <C-e> <End>
-cnoremap <C-p> <Up>
-cnoremap <C-n> <Down>
-cnoremap <C-b> <Left>
-cnoremap <C-f> <Right>
-cnoremap <C-d> <Del>
-
-vnoremap <silent> * :<C-u>call VisualSelection('', '')<CR>/<C-R>=@/<CR><CR>
-vnoremap <silent> # :<C-u>call VisualSelection('', '')<CR>?<C-R>=@/<CR><CR>
-
-map <silent> <leader><cr> :noh<cr>
-
-map <C-j> <C-W>j
-map <C-k> <C-W>k
-map <C-h> <C-W>h
-map <C-l> <C-W>l
-
-nmap <silent> <leader>[ :tabprevious<cr>
-nmap <silent> <leader>] :tabnext<cr>
-
-map <leader>c :Bclose<cr>:tabclose<cr>gT
-
-map <leader>tn :tabnew<cr>
-map <leader>to :tabonly<cr>
-map <leader>tc :tabclose<cr>
-
-map <leader>qn :cn<cr>
-
-" Return to last edit position when opening files
-au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-
-map <silent> <leader>qq :q<cr>
-
-" delete without yanking
-nnoremap <leader>d "_d
-vnoremap <leader>d "_d
-" replace currently selected text with default register
-" without yanking it
-vnoremap <leader>p "_dP
-
-" resize window
-nnoremap <silent> <leader>1 :resize -12<cr> 
-nnoremap <silent> <leader>2 :resize +12<cr> 
-nnoremap <silent> <leader>3 :vertical resize -6<cr> 
-nnoremap <silent> <leader>4 :vertical resize +6<cr> 
-
-" To reload file
-map <silent> <leader>r :checktime<CR>
-
-nnoremap q: <nop>
-nnoremap Q <nop>
-
-command! Bclose call g:BufcloseCloseIt()
-function! g:BufcloseCloseIt()
-  let l:currentBufNum = bufnr("%")
-  let l:alternateBufNum = bufnr("#")
-
-  if buflisted(l:alternateBufNum)
-    buffer #
-  else
-    bnext
-  endif
-
-  if bufnr("%") == l:currentBufNum
-    new
-  endif
-
-  if buflisted(l:currentBufNum)
-    execute("bdelete! ".l:currentBufNum)
-  endif
-endfunction
-
-command! DeleteHiddenBuffers call g:DeleteHiddenBuffers()
-function! g:DeleteHiddenBuffers()
-  let tpbl=[]
-  call map(range(1, tabpagenr('$')), 'extend(tpbl, tabpagebuflist(v:val))')
-  for buf in filter(range(1, bufnr('$')), 'bufexists(v:val) && index(tpbl, v:val)==-1')
-    if getbufvar(buf, '&mod') == 0
-      silent execute 'bwipeout' buf
+  filetype plugin indent on
+  command W w !sudo tee % > /dev/null
+  
+  syntax enable 
+  
+  cnoremap <C-a> <Home>
+  cnoremap <C-e> <End>
+  cnoremap <C-p> <Up>
+  cnoremap <C-n> <Down>
+  cnoremap <C-b> <Left>
+  cnoremap <C-f> <Right>
+  cnoremap <C-d> <Del>
+  
+  vnoremap <silent> * :<C-u>call VisualSelection('', '')<CR>/<C-R>=@/<CR><CR>
+  vnoremap <silent> # :<C-u>call VisualSelection('', '')<CR>?<C-R>=@/<CR><CR>
+  
+  map <silent> <leader><cr> :noh<cr>
+  
+  map <C-j> <C-W>j
+  map <C-k> <C-W>k
+  map <C-h> <C-W>h
+  map <C-l> <C-W>l
+  
+  nmap <silent> <leader>[ :tabprevious<cr>
+  nmap <silent> <leader>] :tabnext<cr>
+  
+  map <leader>c :Bclose<cr>:tabclose<cr>gT
+  
+  map <leader>tn :tabnew<cr>
+  map <leader>to :tabonly<cr>
+  map <leader>tc :tabclose<cr>
+  
+  map <leader>qn :cn<cr>
+  
+  " Return to last edit position when opening files
+  au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+  
+  map <silent> <leader>qq :q<cr>
+  
+  " delete without yanking
+  nnoremap <leader>d "_d
+  vnoremap <leader>d "_d
+  " replace currently selected text with default register
+  " without yanking it
+  vnoremap <leader>p "_dP
+  
+  " resize window
+  nnoremap <silent> <leader>1 :resize -12<cr> 
+  nnoremap <silent> <leader>2 :resize +12<cr> 
+  nnoremap <silent> <leader>3 :vertical resize -6<cr> 
+  nnoremap <silent> <leader>4 :vertical resize +6<cr> 
+  
+  " To reload file
+  map <silent> <leader>r :checktime<CR>
+  
+  nnoremap q: <nop>
+  nnoremap Q <nop>
+  
+  command! Bclose call g:BufcloseCloseIt()
+  function! g:BufcloseCloseIt()
+    let l:currentBufNum = bufnr("%")
+    let l:alternateBufNum = bufnr("#")
+  
+    if buflisted(l:alternateBufNum)
+      buffer #
+    else
+      bnext
     endif
-  endfor
-endfunction
-
-function! CmdLine(str)
-  call feedkeys(":" . a:str)
-endfunction 
-
-function! VisualSelection(direction, extra_filter) range
-  let l:saved_reg = @"
-  execute "normal! vgvy"
-
-  let l:pattern = escape(@", "\\/.*'$^~[]")
-  let l:pattern = substitute(l:pattern, "\n$", "", "")
-
-  if a:direction == 'gv'
-    call CmdLine("Ack '" . l:pattern . "' " )
-  elseif a:direction == 'replace'
-    call CmdLine("%s" . '/'. l:pattern . '/')
-  endif
-
-  let @/ = l:pattern
-  let @" = l:saved_reg
-endfunction
+  
+    if bufnr("%") == l:currentBufNum
+      new
+    endif
+  
+    if buflisted(l:currentBufNum)
+      execute("bdelete! ".l:currentBufNum)
+    endif
+  endfunction
+  
+  command! DeleteHiddenBuffers call g:DeleteHiddenBuffers()
+  function! g:DeleteHiddenBuffers()
+    let tpbl=[]
+    call map(range(1, tabpagenr('$')), 'extend(tpbl, tabpagebuflist(v:val))')
+    for buf in filter(range(1, bufnr('$')), 'bufexists(v:val) && index(tpbl, v:val)==-1')
+      if getbufvar(buf, '&mod') == 0
+        silent execute 'bwipeout' buf
+      endif
+    endfor
+  endfunction
+  
+  function! CmdLine(str)
+    call feedkeys(":" . a:str)
+  endfunction 
+  
+  function! VisualSelection(direction, extra_filter) range
+    let l:saved_reg = @"
+    execute "normal! vgvy"
+  
+    let l:pattern = escape(@", "\\/.*'$^~[]")
+    let l:pattern = substitute(l:pattern, "\n$", "", "")
+  
+    if a:direction == 'gv'
+      call CmdLine("Ack '" . l:pattern . "' " )
+    elseif a:direction == 'replace'
+      call CmdLine("%s" . '/'. l:pattern . '/')
+    endif
+  
+    let @/ = l:pattern
+    let @" = l:saved_reg
+  endfunction
 ]]
 
 vim.keymap.set("n", "<leader>w", "<cmd>w!<CR>")
@@ -178,8 +180,9 @@ require("packer").startup(function()
     requires = "kyazdani42/nvim-web-devicons",
     config = function()
       require "nvim-tree".setup {
+        sort_by = "case_sensitive",
         view = {
-          width = 30,
+          width = 35,
           hide_root_folder = true,
         }
       }
