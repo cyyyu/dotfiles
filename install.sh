@@ -43,8 +43,6 @@ if [ "$action" == "softwares" ]; then
     if [ ! -x "$(command -v stack)" ]; then
       echo "Installing stack"
       curl -sSL https://get.haskellstack.org/ | sh
-      # install hindent for haskell code formatting
-      stack install hindent
     fi
     # install ghcup if not exists
     if [ ! -x "$(command -v ghcup)" ]; then

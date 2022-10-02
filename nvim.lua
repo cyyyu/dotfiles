@@ -288,18 +288,6 @@ require("packer").startup(function()
     end,
   }
 
-  use {
-    "alx741/vim-hindent",
-    config = function()
-      vim.cmd [[
-        augroup HaskellFormat
-          autocmd!
-          autocmd BufRead,BufNewFile *.hs noremap <silent> <leader>l :Hindent<cr>
-        augroup END
-      ]]
-    end,
-  }
-
   -- LSP configs
   -- LSP keybindings
   use {
