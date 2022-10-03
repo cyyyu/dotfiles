@@ -321,7 +321,7 @@ require("packer").startup(function()
           gi = "lua vim.lsp.buf.implementation()",
           gr = "lua vim.lsp.buf.references()",
           K = "lua vim.lsp.buf.hover()",
-          ["<C-k>"] = "lua vim.lsp.buf.signature_help()",
+          ["<C-s>"] = "lua vim.lsp.buf.signature_help()",
           ["[d"] = "lua vim.diagnostic.goto_prev()",
           ["]d"] = "lua vim.diagnostic.goto_next()",
           ["<leader>rn"] = "lua vim.lsp.buf.rename()",
