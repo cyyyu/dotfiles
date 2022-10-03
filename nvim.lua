@@ -329,6 +329,7 @@ require("packer").startup(function()
           ["<leader>l"] = "lua vim.lsp.buf.format({ async = true })",
           ["<leader>e"] = "lua vim.diagnostic.open_float()",
         },
+        on_attach = function() end,
         capabilities = vim.lsp.protocol.make_client_capabilities(),
         servers = {
           sumneko_lua = {
