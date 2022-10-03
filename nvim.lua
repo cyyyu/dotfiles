@@ -9,7 +9,11 @@ vim.o.wildignore = "*.o,*~,*.pyc,*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store,*/node_mo
 vim.o.whichwrap = vim.o.whichwrap .. "<,>,h,l"
 vim.o.ignorecase = true
 vim.o.smartcase = true
+
+-- speed up rendering
 vim.o.lazyredraw = true
+vim.o.ttyfast = true
+
 vim.o.showmatch = true
 vim.o.mat = 2
 vim.o.belloff = "all"
