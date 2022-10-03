@@ -257,13 +257,24 @@ require("packer").startup(function()
     end
   }
 
-  use { "nvim-lualine/lualine.nvim",
+  use {
+    "nvim-lualine/lualine.nvim",
+    requires = { { "nvim-lua/lsp-status.nvim" } },
     config = function()
       require("lualine").setup {
-        theme = "auto",
         extensions = { "nvim-tree" },
+        sections = {
+          lualine_a = { 'mode' },
+          lualine_b = { 'branch', 'diff', 'require"lsp-status".status()' },
+          lualine_c = { '' },
+          lualine_x = { 'filetype' },
+          lualine_y = { 'progress' },
+          lualine_z = { 'location' }
+        },
+        options = { section_separators = '', component_separators = '' }
       }
-    end }
+    end
+  }
 
   use {
     "lewis6991/gitsigns.nvim", requires = { "nvim-lua/plenary.nvim" },
