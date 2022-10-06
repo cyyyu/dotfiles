@@ -35,6 +35,7 @@ vim.o.clipboard = "unnamedplus"
 vim.o.cc = 80
 vim.o.signcolumn = "yes"
 vim.o.cmdheight = 2
+vim.o.background = "dark"
 
 -- disable netrw and use nvim-tree instead
 vim.g.loaded = 1
