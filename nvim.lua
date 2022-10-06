@@ -172,10 +172,9 @@ require("packer").startup(function()
   use "wbthomason/packer.nvim"
 
   use {
-    "projekt0n/github-nvim-theme",
+    "ellisonleao/gruvbox.nvim",
     config = function()
-      require("github-theme").setup()
-      vim.cmd [[colorscheme github_dark_default]]
+      vim.cmd [[colorscheme gruvbox]]
     end,
   }
 
