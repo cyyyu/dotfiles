@@ -252,6 +252,7 @@ require("packer").startup(function()
       vim.cmd [[
         let g:copilot_filetypes = {
           \ 'yaml': v:true,
+          \ 'markdown': v:true,
           \ }
       ]]
     end
