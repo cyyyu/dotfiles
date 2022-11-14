@@ -3,7 +3,7 @@
 vim.g.mapleader = " "
 vim.o.nu = true
 vim.o.history = 1000
-vim.o.so = 10
+vim.o.so = 1
 vim.o.wildmode = "longest:full,full"
 vim.o.wildignore = "*.o,*~,*.pyc,*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store,*/node_modules/*"
 vim.o.whichwrap = vim.o.whichwrap .. "<,>,h,l"
