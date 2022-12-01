@@ -306,45 +306,41 @@ require("packer").startup(function()
   -- LSP configs
   -- LSP keybindings
   use {
-    "junnplus/lsp-setup.nvim",
-    requires = {
-      "neovim/nvim-lspconfig",
-      "williamboman/mason.nvim",
-      "williamboman/mason-lspconfig.nvim",
-    },
+    "neovim/nvim-lspconfig",
+    requires = { "williamboman/mason.nvim", "williamboman/mason-lspconfig.nvim" },
     config = function()
-      require("lsp-setup").setup({
-        default_mappings = false,
-        mappings = {
-          gD = "lua vim.lsp.buf.declaration()",
-          gd = "lua vim.lsp.buf.definition()",
-          gi = "lua vim.lsp.buf.implementation()",
-          gr = "lua vim.lsp.buf.references()",
-          K = "lua vim.lsp.buf.hover()",
-          ["<C-s>"] = "lua vim.lsp.buf.signature_help()",
-          ["[d"] = "lua vim.diagnostic.goto_prev()",
-          ["]d"] = "lua vim.diagnostic.goto_next()",
-          ["<leader>rn"] = "lua vim.lsp.buf.rename()",
-          ["<leader>ca"] = "lua vim.lsp.buf.code_action()",
-          ["<leader>l"] = "lua vim.lsp.buf.format({ async = true })",
-          ["<leader>e"] = "lua vim.diagnostic.open_float()",
-        },
-        on_attach = function() end,
-        capabilities = vim.lsp.protocol.make_client_capabilities(),
-        servers = {
-          sumneko_lua = {
+      require("mason").setup()
+      require("mason-lspconfig").setup()
+      require("mason-lspconfig").setup_handlers {
+        function(server_name) -- default handler (optional)
+          require("lspconfig")[server_name].setup {}
+        end,
+        ["sumneko_lua"] = function()
+          require("lspconfig").sumneko_lua.setup {
             settings = {
               Lua = {
                 diagnostics = {
                   globals = { "vim" }
-                },
-              },
+                }
+              }
             }
-          },
-          tsserver = {},
-          hls = {},
-        }
-      })
+          }
+        end,
+      }
+
+      -- LSP keybindings
+      vim.keymap.set("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>")
+      vim.keymap.set("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>")
+      vim.keymap.set("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>")
+      vim.keymap.set("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>")
+      vim.keymap.set("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>")
+      vim.keymap.set("n", "<C-s>", "<cmd>lua vim.lsp.buf.signature_help()<CR>")
+      vim.keymap.set("n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<CR>")
+      vim.keymap.set("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>")
+      vim.keymap.set("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>")
+      vim.keymap.set("n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>")
+      vim.keymap.set("n", "<leader>l", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>")
+      vim.keymap.set("n", "<leader>e", "<cmd>lua vim.diagnostic.open_float()<CR>")
     end
   }
 
