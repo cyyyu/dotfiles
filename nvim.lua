@@ -201,7 +201,6 @@ require("packer").startup(function()
   use { "windwp/nvim-autopairs", config = function()
     require("nvim-autopairs").setup()
   end }
-  use "yuttie/comfortable-motion.vim"
   use { "lukas-reineke/indent-blankline.nvim", config = function()
     vim.opt.list = true
     require("indent_blankline").setup {}
@@ -413,6 +412,16 @@ require("packer").startup(function()
           ["+"] = "-",
           ["*"] = "/",
         }
+      })
+    end
+  }
+
+  use {
+    "declancm/cinnamon.nvim",
+    config = function() require("cinnamon").setup({
+        extra_keymaps = true,
+        extended_keymaps = true,
+        hide_cursor = true,
       })
     end
   }
