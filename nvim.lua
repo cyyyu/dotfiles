@@ -96,7 +96,7 @@ vim.cmd [[
   vnoremap <leader>d "_d
   " replace currently selected text with default register
   " without yanking it
-  vnoremap <leader>p "_dP
+  vnoremap <leader>P "_dP
   
   " resize window
   nnoremap <silent> <leader>1 :resize -12<cr> 
@@ -216,7 +216,7 @@ require("packer").startup(function()
           file_ignore_patterns = { "node_modules" },
         },
       }
-      vim.keymap.set("n", "<leader>f", "<cmd>Telescope find_files<CR>",
+      vim.keymap.set("n", "<leader>p", "<cmd>Telescope find_files<CR>",
         { noremap = true, silent = true })
       vim.keymap.set("n", "<leader>b", "<cmd>Telescope buffers<CR>",
         { noremap = true, silent = true })
@@ -307,7 +307,7 @@ require("packer").startup(function()
   -- LSP keybindings
   use {
     "neovim/nvim-lspconfig",
-    requires = { "williamboman/mason.nvim", "williamboman/mason-lspconfig.nvim" },
+    requires = { "williamboman/mason.nvim", "williamboman/mason-lspconfig.nvim", "jose-elias-alvarez/null-ls.nvim" },
     config = function()
       require("mason").setup()
       require("mason-lspconfig").setup()
@@ -328,6 +328,14 @@ require("packer").startup(function()
         end,
       }
 
+      local null_ls = require("null-ls")
+      null_ls.setup({
+        sources = {
+          null_ls.builtins.formatting.shfmt, -- shell script formatting
+          null_ls.builtins.formatting.prettierd,
+        }
+      })
+
       -- LSP keybindings
       vim.keymap.set("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>")
       vim.keymap.set("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>")
@@ -339,7 +347,7 @@ require("packer").startup(function()
       vim.keymap.set("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>")
       vim.keymap.set("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>")
       vim.keymap.set("n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>")
-      vim.keymap.set("n", "<leader>l", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>")
+      vim.keymap.set("n", "<leader>f", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>")
       vim.keymap.set("n", "<leader>e", "<cmd>lua vim.diagnostic.open_float()<CR>")
     end
   }
