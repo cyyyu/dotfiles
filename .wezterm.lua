@@ -12,5 +12,5 @@ return {
   initial_cols = 100,
   initial_rows = 30,
   font = wezterm.font('JetBrains Mono'),
-  font_size = 12,
+  font_size = 14,
 }
