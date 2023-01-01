@@ -214,6 +214,15 @@ require("packer").startup(function()
       require("telescope").setup {
         defaults = {
           file_ignore_patterns = { "node_modules" },
+          layout_strategy = "center",
+          layout_config = {
+            center = {
+              height = 0.6,
+              preview_cutoff = 30,
+              prompt_position = "top",
+              width = 0.5
+            },
+          }
         },
       }
       vim.keymap.set("n", "<leader>p", "<cmd>Telescope find_files<CR>",
