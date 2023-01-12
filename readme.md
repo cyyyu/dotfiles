@@ -1,7 +1,6 @@
 Installation:
 ```
-> ./install.sh softwares
-> ./install.sh dotfiles
+> ./install.sh
 ```
 
 Add these manually:
