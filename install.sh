@@ -20,7 +20,7 @@ for software in "${softwares[@]}"; do
     if [ ! -z "$isMac" ]; then
       brew install $software
     elif [ ! -z "$isLinux" ]; then
-      sudo apt install $software
+      sudo apt install -y $software
     fi
   fi
 done
