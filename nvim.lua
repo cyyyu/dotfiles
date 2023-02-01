@@ -167,6 +167,40 @@ vim.keymap.set("n", "<leader>w", "<cmd>w!<CR>")
 
 -- End general configs
 
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable", -- latest stable release
+    lazypath,
+  })
+end
+vim.opt.rtp:prepend(lazypath)
+require("lazy").setup({
+  "ellisonleao/gruvbox.nvim",
+  "kyazdani42/nvim-tree.lua",
+  "mattn/emmet-vim",
+  "scrooloose/nerdcommenter",
+  "sheerun/vim-polyglot",
+  "windwp/nvim-autopairs",
+  "lukas-reineke/indent-blankline.nvim",
+  "nvim-telescope/telescope.nvim",
+  "skywind3000/asyncrun.vim",
+  "zivyangll/git-blame.vim",
+  "tikhomirov/vim-glsl",
+  "github/copilot.vim",
+  "nvim-lualine/lualine.nvim",
+  "lewis6991/gitsigns.nvim",
+  "nvim-treesitter/nvim-treesitter",
+  "neovim/nvim-lspconfig",
+  "hrsh7th/nvim-cmp",
+  "nguyenvukhang/nvim-toggler",
+  "declancm/cinnamon.nvim"
+}, {})
+
 -- Plugins
 local use = require("packer").use
 require("packer").startup(function()
