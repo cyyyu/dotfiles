@@ -167,21 +167,30 @@ vim.keymap.set("n", "<leader>w", "<cmd>w!<CR>")
 
 -- End general configs
 
--- Plugins
-local use = require("packer").use
-require("packer").startup(function()
-  use "wbthomason/packer.nvim"
-
-  use {
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable", -- latest stable release
+    lazypath,
+  })
+end
+vim.opt.rtp:prepend(lazypath)
+require("lazy").setup({
+  {
     "ellisonleao/gruvbox.nvim",
+    lazy = false,
     config = function()
       vim.cmd [[colorscheme gruvbox]]
     end,
-  }
+  },
 
-  use {
+  {
     "kyazdani42/nvim-tree.lua",
-    requires = "kyazdani42/nvim-web-devicons",
+    dependencies = { "kyazdani42/nvim-web-devicons" },
     config = function()
       require "nvim-tree".setup {
         sort_by = "case_sensitive",
@@ -194,22 +203,22 @@ require("packer").startup(function()
       vim.keymap.set("n", "<leader>v", "<cmd>NvimTreeFindFile<cr>", { remap = false })
       vim.o.termguicolors = true
     end
-  }
-  use "mattn/emmet-vim"
-  use "scrooloose/nerdcommenter"
-  use "sheerun/vim-polyglot"
-  use { "windwp/nvim-autopairs", config = function()
-    require("nvim-autopairs").setup()
-  end }
-  use { "lukas-reineke/indent-blankline.nvim", config = function()
+  },
+
+  "mattn/emmet-vim",
+  "scrooloose/nerdcommenter",
+  "sheerun/vim-polyglot",
+
+  { "windwp/nvim-autopairs", config = true },
+
+  { "lukas-reineke/indent-blankline.nvim", config = function()
     vim.opt.list = true
     require("indent_blankline").setup {}
-  end }
+  end },
 
-  -- telescope
-  use {
+  {
     "nvim-telescope/telescope.nvim", tag = "0.1.0",
-    requires = { { "nvim-lua/plenary.nvim" } },
+    dependencies = { "nvim-lua/plenary.nvim" },
     config = function()
       require("telescope").setup {
         defaults = {
@@ -232,29 +241,30 @@ require("packer").startup(function()
       vim.keymap.set("n", "<leader>g", "<cmd>Telescope live_grep<CR>",
         { noremap = true, silent = true })
     end
-  }
+  },
 
-  use { "skywind3000/asyncrun.vim", config = function()
+  { "skywind3000/asyncrun.vim", config = function()
     vim.g.asyncrun_open = 16
     vim.g.asyncrun_bell = 1
     vim.keymap.set("n", "<leader>as", "<cmd>AsyncStop<cr>")
     vim.keymap.set("n", "<cr>", "<cmd>call asyncrun#quickfix_toggle(16)<cr>", { noremap = false })
-  end }
+  end },
 
-  use {
+  {
     "zivyangll/git-blame.vim",
     config = function()
       vim.keymap.set("n", "<leader>s", "<cmd>call gitblame#echo()<cr>")
     end
-  }
+  },
 
-  use {
+  {
     "tikhomirov/vim-glsl",
     config = function()
       vim.cmd("autocmd! BufNewFile,BufRead *.vs,*.fs set ft=glsl")
     end
-  }
-  use {
+  },
+
+  {
     "github/copilot.vim",
     config = function()
       vim.cmd [[
@@ -264,11 +274,11 @@ require("packer").startup(function()
           \ }
       ]]
     end
-  }
+  },
 
-  use {
+  {
     "nvim-lualine/lualine.nvim",
-    requires = { { "nvim-lua/lsp-status.nvim" } },
+    dependencies = { "nvim-lua/lsp-status.nvim" },
     config = function()
       require("lualine").setup {
         extensions = { "nvim-tree" },
@@ -283,16 +293,15 @@ require("packer").startup(function()
         options = { section_separators = '', component_separators = '' }
       }
     end
-  }
+  },
 
-  use {
-    "lewis6991/gitsigns.nvim", requires = { "nvim-lua/plenary.nvim" },
-    config = function() require("gitsigns").setup() end
-  }
+  {
+    "lewis6991/gitsigns.nvim", dependencies = { "nvim-lua/plenary.nvim" },
+    config = true
+  },
 
-  use {
+  {
     "nvim-treesitter/nvim-treesitter",
-    run = ":TSUpdate",
     config = function()
       require("nvim-treesitter.configs").setup {
         highlight = { enable = true },
@@ -310,13 +319,11 @@ require("packer").startup(function()
       vim.opt.foldmethod = "expr"
       vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
     end,
-  }
+  },
 
-  -- LSP configs
-  -- LSP keybindings
-  use {
+  {
     "neovim/nvim-lspconfig",
-    requires = { "williamboman/mason.nvim", "williamboman/mason-lspconfig.nvim", "jose-elias-alvarez/null-ls.nvim" },
+    dependencies = { "williamboman/mason.nvim", "williamboman/mason-lspconfig.nvim", "jose-elias-alvarez/null-ls.nvim" },
     config = function()
       require("mason").setup()
       require("mason-lspconfig").setup()
@@ -359,13 +366,12 @@ require("packer").startup(function()
       vim.keymap.set("n", "<leader>f", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>")
       vim.keymap.set("n", "<leader>e", "<cmd>lua vim.diagnostic.open_float()<CR>")
     end
-  }
+  },
 
-  use {
+  {
     "hrsh7th/nvim-cmp",
-    requires = { "neovim/nvim-lspconfig", "hrsh7th/cmp-nvim-lsp", "hrsh7th/cmp-buffer", "hrsh7th/cmp-path",
+    dependencies = { "neovim/nvim-lspconfig", "hrsh7th/cmp-nvim-lsp", "hrsh7th/cmp-buffer", "hrsh7th/cmp-path",
       "hrsh7th/cmp-cmdline", "hrsh7th/cmp-vsnip", "hrsh7th/vim-vsnip" },
-    after = { "nvim-lspconfig" },
     config = function()
       vim.cmd [[set completeopt=menu,menuone,noselect]]
 
@@ -410,10 +416,9 @@ require("packer").startup(function()
         })
       })
     end
-  }
-  -- End LSP configs
+  },
 
-  use {
+  {
     "nguyenvukhang/nvim-toggler",
     config = function()
       require("nvim-toggler").setup({
@@ -427,9 +432,9 @@ require("packer").startup(function()
         }
       })
     end
-  }
+  },
 
-  use {
+  {
     "declancm/cinnamon.nvim",
     config = function() require("cinnamon").setup({
         extra_keymaps = true,
@@ -438,6 +443,4 @@ require("packer").startup(function()
       })
     end
   }
-
-end)
--- End plugins
+}, {})
