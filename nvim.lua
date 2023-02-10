@@ -190,7 +190,12 @@ require("lazy").setup({
 
   {
     "kyazdani42/nvim-tree.lua",
+    lazy = true,
     dependencies = { "kyazdani42/nvim-web-devicons" },
+    keys = {
+      { "<c-n>", "<cmd>NvimTreeToggle<cr>", desc = "NvimTree" },
+      { "<leader>v", "<cmd>NvimTreeFindFile<cr>", desc = "NvimTreeFindFile" },
+    },
     config = function()
       require "nvim-tree".setup {
         sort_by = "case_sensitive",
@@ -199,8 +204,6 @@ require("lazy").setup({
           hide_root_folder = true,
         }
       }
-      vim.keymap.set("n", "<c-n>", "<cmd>NvimTreeToggle<cr>", { remap = false })
-      vim.keymap.set("n", "<leader>v", "<cmd>NvimTreeFindFile<cr>", { remap = false })
       vim.o.termguicolors = true
     end
   },
