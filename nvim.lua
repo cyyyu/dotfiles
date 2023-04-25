@@ -310,27 +310,6 @@ require("lazy").setup({
   },
 
   {
-    "nvim-treesitter/nvim-treesitter",
-    config = function()
-      require("nvim-treesitter.configs").setup {
-        highlight = { enable = true },
-        ensure_installed = {
-          "javascript",
-          "typescript",
-          "lua",
-          "haskell"
-        },
-        sync_install = false,
-        indent = { enable = true },
-        additional_vim_regex_highlighting = false,
-      }
-      vim.opt.foldlevel = 20
-      vim.opt.foldmethod = "expr"
-      vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
-    end,
-  },
-
-  {
     "neovim/nvim-lspconfig",
     dependencies = { "williamboman/mason.nvim", "williamboman/mason-lspconfig.nvim", "jose-elias-alvarez/null-ls.nvim" },
     config = function()
@@ -368,6 +347,28 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>f", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>")
       vim.keymap.set("n", "<leader>e", "<cmd>lua vim.diagnostic.open_float()<CR>")
     end
+  },
+
+  {
+    "nvim-treesitter/nvim-treesitter",
+    run = ':TSUpdate',
+    config = function()
+      require("nvim-treesitter.configs").setup {
+        ensure_installed = {
+          "javascript",
+          "typescript",
+          "lua",
+          "haskell"
+        },
+        sync_install = false,
+        auto_install = false,
+        highlight = { enable = true },
+        additional_vim_regex_highlighting = false,
+      }
+      vim.opt.foldlevel = 20
+      vim.opt.foldmethod = "expr"
+      vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+    end,
   },
 
   {
