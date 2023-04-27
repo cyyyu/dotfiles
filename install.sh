@@ -63,13 +63,6 @@ if [ ! -f ~/.npmrc ]; then
 fi
 
 # config nvim stuff
-if [ ! -d "$HOME/.local/share/nvim/site/pack/packer/start/packer.nvim" ]
-then
-  echo "Installing packer..."
-  git clone --depth 1 https://github.com/wbthomason/packer.nvim\
-    ~/.local/share/nvim/site/pack/packer/start/packer.nvim
-fi
-
 undodir="$HOME/.vim_undo" 
 if [ ! -d $undodir ]
 then
