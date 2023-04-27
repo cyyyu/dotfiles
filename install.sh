@@ -31,6 +31,15 @@ if [ ! -d "$HOME/.oh-my-zsh" ]; then
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 fi
 
+# install "@cyyyu/ai" with npm if not exists
+if [ ! -x "$(command -v ai)" ]; then
+  # check if npm is installed
+  if command -v npm &> /dev/null; then
+    echo "Installing @cyyyu/ai"
+    npm install -g @cyyyu/ai
+  fi
+fi
+
 # haskell
 # install ghcup if not exists
 if [ ! -x "$(command -v ghcup)" ]; then

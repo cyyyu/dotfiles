@@ -18,6 +18,7 @@ alias dk=docker
 alias dc=docker-compose
 alias rgf='rg --files | rg'
 alias v=nvim
+alias i='ai -i'
 
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden'
 
