@@ -207,8 +207,15 @@ require("lazy").setup({
   },
 
   "mattn/emmet-vim",
-  "scrooloose/nerdcommenter",
   "sheerun/vim-polyglot",
+
+  {
+    "scrooloose/nerdcommenter",
+    config = function()
+      vim.g.NERDSpaceDelims = 1
+    end
+  },
+
 
   { "windwp/nvim-autopairs", config = true },
 
