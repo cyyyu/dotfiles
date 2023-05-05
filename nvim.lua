@@ -317,42 +317,104 @@ require("lazy").setup({
   },
 
   {
-    "neovim/nvim-lspconfig",
-    dependencies = { "williamboman/mason.nvim", "williamboman/mason-lspconfig.nvim", "jose-elias-alvarez/null-ls.nvim" },
+    "nvim-treesitter/nvim-treesitter",
     config = function()
-      require("mason").setup()
-      require("mason-lspconfig").setup()
-
-      local lspconfig = require("lspconfig")
-
-      require("mason-lspconfig").setup_handlers {
-        -- This is a default handler that will be called for each installed server (also for new servers that are installed during a session)
-        function(server_name)
-          lspconfig[server_name].setup {}
-        end,
+      require("nvim-treesitter.configs").setup {
+        highlight = {
+          enable = true,
+          additional_vim_regex_highlighting = false,
+        },
+        auto_install = true,
+        ensure_installed = {
+          "javascript",
+          "typescript",
+          "lua",
+          "haskell",
+          "help"
+        },
+        sync_install = false,
+        additional_vim_regex_highlighting = false,
       }
+      vim.opt.foldlevel = 20
+      vim.opt.foldmethod = "expr"
+      vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+    end,
+  },
 
-      local null_ls = require("null-ls")
-      null_ls.setup({
-        sources = {
-          null_ls.builtins.formatting.shfmt, -- shell script formatting
-          null_ls.builtins.formatting.prettierd,
-        }
+  {
+    'VonHeikemen/lsp-zero.nvim',
+    branch = 'v2.x',
+    dependencies = {
+      -- LSP Support
+      { 'neovim/nvim-lspconfig' }, -- Required
+      {
+        'williamboman/mason.nvim',
+        build = function()
+          pcall(vim.cmd, 'MasonUpdate')
+        end,
+      },
+      { 'williamboman/mason-lspconfig.nvim' }, -- Optional
+      { 'hrsh7th/nvim-cmp' },                  -- Required
+      { 'hrsh7th/cmp-nvim-lsp' },              -- Required
+      { 'L3MON4D3/LuaSnip' },                  -- Required
+    },
+    config = function()
+      local lsp = require "lsp-zero"
+      lsp.preset("recommended")
+      lsp.ensure_installed({
+        'tsserver',
+        'eslint',
       })
 
-      -- LSP keybindings
-      vim.keymap.set("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>")
-      vim.keymap.set("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>")
-      vim.keymap.set("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>")
-      vim.keymap.set("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>")
-      vim.keymap.set("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>")
-      vim.keymap.set("n", "<C-s>", "<cmd>lua vim.lsp.buf.signature_help()<CR>")
-      vim.keymap.set("n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<CR>")
-      vim.keymap.set("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>")
-      vim.keymap.set("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>")
-      vim.keymap.set("n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>")
-      vim.keymap.set("n", "<leader>f", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>")
-      vim.keymap.set("n", "<leader>e", "<cmd>lua vim.diagnostic.open_float()<CR>")
+      -- Fix Undefined global 'vim'
+      lsp.nvim_workspace()
+
+      local cmp = require "cmp"
+      local cmp_select = { behavior = cmp.SelectBehavior.select }
+      local cmp_mappings = lsp.defaults.cmp_mappings({
+        ['C-p>'] = cmp.mapping.select_prev_item(cmp_select),
+        ['C-n>'] = cmp.mapping.select_next_item(cmp_select),
+        ['<C-Space>'] = cmp.mapping.complete(),
+        ['<C-e>'] = cmp.mapping.close(),
+        ['<C-l>'] = cmp.mapping.confirm({
+          behavior = cmp.ConfirmBehavior.insert,
+          select = true,
+        }),
+      })
+
+      cmp_mappings['<Tab>'] = nil
+      cmp_mappings['<S-Tab>'] = nil
+
+      lsp.set_preferences({
+        suggest_lsp_servers = false,
+        sign_icons = {
+          Error = "",
+          Warning = "",
+          Hint = "",
+          Information = "",
+        },
+      })
+      lsp.on_attach(function(client, bufnr)
+        local opts = { buffer = bufnr, remap = false }
+
+        vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
+        vim.keymap.set("n", "gD", function() vim.lsp.buf.declaration() end, opts)
+        vim.keymap.set("n", "gi", function() vim.lsp.buf.implementation() end, opts)
+        vim.keymap.set("n", "gr", function() vim.lsp.buf.references() end, opts)
+        vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts)
+        vim.keymap.set("n", "[d", function() vim.diagnostic.goto_prev() end, opts)
+        vim.keymap.set("n", "]d", function() vim.diagnostic.goto_next() end, opts)
+        vim.keymap.set("n", "<leader>ca", function() vim.lsp.buf.code_action() end, opts)
+        vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts)
+        vim.keymap.set("n", "<leader>rn", function() vim.lsp.buf.rename() end, opts)
+        vim.keymap.set("n", "<leader>f", function() vim.lsp.buf.format({ async = true }) end, opts)
+        vim.keymap.set("n", "<leader>e", function() vim.diagnostic.open_float() end, opts)
+      end)
+      lsp.setup()
+
+      vim.diagnostic.config({
+        virtual_text = true
+      })
     end
   },
 
@@ -454,5 +516,12 @@ require("lazy").setup({
         scroll_limit = 40,
       })
     end
-  }
+  },
+
+  {
+    "mbbill/undotree",
+    config = function()
+      vim.keymap.set("n", "<leader>u", ":UndotreeToggle<CR>")
+    end
+  },
 }, {})
