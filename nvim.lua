@@ -182,6 +182,7 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
   {
     "ellisonleao/gruvbox.nvim",
+    lazy = false,
     priority = 1000,
     config = function() vim.cmd [[colorscheme gruvbox]] end,
   },
@@ -252,16 +253,6 @@ require("lazy").setup({
         { noremap = true, silent = true })
       vim.keymap.set("n", "<leader>g", "<cmd>Telescope live_grep<CR>",
         { noremap = true, silent = true })
-    end
-  },
-
-  {
-    "skywind3000/asyncrun.vim",
-    config = function()
-      vim.g.asyncrun_open = 16
-      vim.g.asyncrun_bell = 1
-      vim.keymap.set("n", "<leader>as", "<cmd>AsyncStop<cr>")
-      vim.keymap.set("n", "<cr>", "<cmd>call asyncrun#quickfix_toggle(16)<cr>", { noremap = false })
     end
   },
 
@@ -367,7 +358,7 @@ require("lazy").setup({
       })
 
       -- Fix Undefined global 'vim'
-      lsp.nvim_workspace()
+      lsp.nvim_lua_ls()
 
       local cmp = require "cmp"
       local cmp_select = { behavior = cmp.SelectBehavior.select }
