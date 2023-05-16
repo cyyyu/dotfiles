@@ -517,4 +517,11 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>u", ":UndotreeToggle<CR>")
     end
   },
+
+  {
+    "ggandor/leap.nvim",
+    config = function()
+      require('leap').add_default_mappings()
+    end
+  }
 }, {})
