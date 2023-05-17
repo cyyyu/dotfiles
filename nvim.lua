@@ -1,40 +1,97 @@
 --General configs
 
+-- Use space as the leader key
 vim.g.mapleader = " "
+
+-- Show line numbers
 vim.o.nu = true
+
+-- Increase the size of the history
 vim.o.history = 1000
+
+-- Enable writing of swap files
 vim.o.so = 1
+
+-- Set the wildmode to longest:full and full
 vim.o.wildmode = "longest:full,full"
-vim.o.wildignore = "*.o,*~,*.pyc,*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store,*/node_modules/*"
+
+-- Ignore certain file types when using wildcards
+vim.o.wildignore = ".o,~,.pyc,/.git/,/.hg/,/.svn/,/.DS_Store,/node_modules/"
+
+-- Allow < and > to move to the beginning and end of a line
 vim.o.whichwrap = vim.o.whichwrap .. "<,>,h,l"
+
+-- Ignore case when searching
 vim.o.ignorecase = true
+
+-- Use smart case when searching (case sensitive if uppercase)
 vim.o.smartcase = true
 
--- speed up rendering
+-- Enable lazyredraw and ttyfast for faster rendering
 vim.o.lazyredraw = true
 vim.o.ttyfast = true
 
+-- Show matching brackets
 vim.o.showmatch = true
+
+-- Number of tenths of a second to show the matching bracket
 vim.o.mat = 2
+
+-- Turn off all bells
 vim.o.belloff = "all"
+
+-- Time in milliseconds to wait for a mapped sequence to complete
 vim.o.tm = 500
+
+-- Automatically reload files when they change on disk
 vim.cmd("au FocusGained,BufEnter * checktime")
+
+-- Set the encoding to UTF-8
 vim.o.encoding = "utf8"
+
+-- Set the file format list to Unix, DOS, and Mac
 vim.o.ffs = "unix,dos,mac"
+
+-- Expand tabs to spaces
 vim.o.expandtab = true
-vim.o.shiftwidth = 2
+
+-- Number of spaces to use for each tab
 vim.o.tabstop = 2
+
+-- Number of spaces to use for each tab in insert mode
 vim.o.softtabstop = 2
+
+-- Insert line breaks
 vim.o.lbr = true
+
+-- Set the text width to 500 characters
 vim.o.textwidth = 500
+
+-- Use smart indentation
 vim.o.smartindent = true
+
+-- Number of milliseconds of inactivity before updating the swap file
 vim.o.updatetime = 300
+
+-- Switch to open buffer if possible when closing a buffer
 vim.o.switchbuf = "useopen,usetab,newtab"
+
+-- Number of seconds to wait for a mapped sequence to complete
 vim.o.stal = 2
+
+-- Use the system clipboard for yanking, pasting, etc.
 vim.o.clipboard = "unnamedplus"
+
+-- Number of columns for the text wrap
 vim.o.cc = 80
+
+-- Always show the sign column
 vim.o.signcolumn = "yes"
+
+-- Height of the command-line
 vim.o.cmdheight = 2
+
+-- Set the background to dark
 vim.o.background = "dark"
 
 -- disable netrw and use nvim-tree instead
