@@ -328,21 +328,6 @@ require("lazy").setup({
   },
 
   {
-    "github/copilot.vim",
-    config = function()
-      vim.cmd [[
-        let g:copilot_filetypes = {
-          \ 'yaml': v:true,
-          \ 'markdown': v:true,
-          \ }
-
-        imap <silent><script><expr> <C-j> copilot#Accept("\<CR>")
-        let g:copilot_no_tab_map = v:true
-      ]]
-    end
-  },
-
-  {
     "nvim-lualine/lualine.nvim",
     dependencies = { "nvim-lua/lsp-status.nvim" },
     config = function()
@@ -579,6 +564,16 @@ require("lazy").setup({
     "ggandor/leap.nvim",
     config = function()
       require('leap').add_default_mappings()
+    end
+  },
+
+  {
+    'Exafunction/codeium.vim',
+    config = function()
+      vim.keymap.set('i', '<C-j>', function() return vim.fn['codeium#Accept']() end, { expr = true })
+      vim.keymap.set('i', '<c-;>', function() return vim.fn['codeium#CycleCompletions'](1) end, { expr = true })
+      vim.keymap.set('i', '<c-,>', function() return vim.fn['codeium#CycleCompletions'](-1) end, { expr = true })
+      vim.keymap.set('i', '<c-x>', function() return vim.fn['codeium#Clear']() end, { expr = true })
     end
   }
 }, {})
