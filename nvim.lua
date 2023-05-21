@@ -89,7 +89,7 @@ vim.o.cc = 80
 vim.o.signcolumn = "yes"
 
 -- Height of the command-line
-vim.o.cmdheight = 2
+vim.o.cmdheight = 1
 
 -- Set the background to dark
 vim.o.background = "dark"
