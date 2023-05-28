@@ -393,6 +393,7 @@ require("lazy").setup({
       { 'hrsh7th/nvim-cmp' },                  -- Required
       { 'hrsh7th/cmp-nvim-lsp' },              -- Required
       { 'L3MON4D3/LuaSnip' },                  -- Required
+      { 'jose-elias-alvarez/null-ls.nvim' },
     },
     config = function()
       local lsp = require "lsp-zero"
@@ -442,10 +443,29 @@ require("lazy").setup({
         vim.keymap.set("n", "]d", function() vim.diagnostic.goto_next() end, opts)
         vim.keymap.set("n", "<leader>ca", function() vim.lsp.buf.code_action() end, opts)
         vim.keymap.set("n", "<leader>rn", function() vim.lsp.buf.rename() end, opts)
-        vim.keymap.set("n", "<leader>f", function() vim.lsp.buf.format({ async = true }) end, opts)
         vim.keymap.set("n", "<leader>e", function() vim.diagnostic.open_float() end, opts)
       end)
+
+      lsp.format_mapping('<leader>f', {
+        format_opts = {
+          async = false,
+          timeout_ms = 10000,
+        },
+        servers = {
+          ['null-ls'] = { 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'lua' },
+        }
+      })
+
       lsp.setup()
+
+      -- config null-ls
+      local null_ls = require "null-ls"
+      null_ls.setup {
+        sources = {
+          null_ls.builtins.formatting.stylua,
+          null_ls.builtins.formatting.prettierd
+        },
+      }
 
       vim.diagnostic.config({
         virtual_text = true
