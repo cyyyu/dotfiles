@@ -259,7 +259,12 @@ require("lazy").setup({
 				sort_by = "case_sensitive",
 				view = {
 					width = 35,
-					hide_root_folder = true,
+				},
+				renderer = {
+					root_folder_label = false,
+				},
+				git = {
+					ignore = false,
 				},
 			})
 			vim.o.termguicolors = true
