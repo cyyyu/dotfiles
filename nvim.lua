@@ -403,7 +403,6 @@ require("lazy").setup({
 			lsp.preset("recommended")
 			lsp.ensure_installed({
 				"tsserver",
-				"eslint",
 			})
 
 			-- Fix Undefined global 'vim'
