@@ -634,4 +634,8 @@ require("lazy").setup({
 			end, { expr = true })
 		end,
 	},
+
+	{
+		"prisma/vim-prisma",
+	},
 }, {})
