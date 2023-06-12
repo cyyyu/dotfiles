@@ -98,6 +98,29 @@ vim.o.background = "dark"
 vim.g.loaded = 1
 vim.g.loaded_netrwPlugin = 1
 
+-- toggle quickfix window
+vim.keymap.set("n", "<leader>q", ":copen<CR>")
+
+function ToggleQuickFix()
+	local function isQuickfixOpen()
+		local win_info_list = vim.fn.getwininfo()
+		for _, win_info in ipairs(win_info_list) do
+			if win_info.quickfix == 1 then
+				return true
+			end
+		end
+		return false
+	end
+
+	if isQuickfixOpen() then
+		vim.cmd("cclose")
+	else
+		vim.cmd("copen")
+	end
+end
+
+vim.api.nvim_set_keymap("n", "<cr>", ":lua ToggleQuickFix()<CR>", { noremap = true, silent = true })
+
 vim.cmd([[
   set undodir=~/.vim_undo
   set undofile
