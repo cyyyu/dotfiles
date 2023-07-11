@@ -21,6 +21,9 @@ alias v=nvim
 alias i='ai -i'
 alias commit='git add . && git commit -m'
 
+# prompt borrowed from https://github.com/openai-translator/openai-translator/blob/main/src/common/translate.ts
+alias polish='ai -p "You are an expert translator, please revise the following sentences to make them more clear, concise, and coherent."'
+
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden'
 
 if [ -f /etc/env ]; then
