@@ -497,7 +497,16 @@ require("lazy").setup({
 					timeout_ms = 10000,
 				},
 				servers = {
-					["null-ls"] = { "javascript", "typescript", "javascriptreact", "typescriptreact", "lua" },
+					["null-ls"] = {
+						"javascript",
+						"typescript",
+						"javascriptreact",
+						"typescriptreact",
+						"lua",
+						"html",
+						"css",
+						"scss",
+					},
 				},
 			})
 
