@@ -457,7 +457,6 @@ require("lazy").setup({
 				sections = {
 					lualine_a = { "mode" },
 					lualine_b = { "branch", "diff", 'require"lsp-status".status()' },
-					lualine_c = { "" },
 					lualine_x = { "filetype" },
 					lualine_y = { "progress" },
 					lualine_z = { "location" },
