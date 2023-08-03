@@ -100,6 +100,9 @@ vim.g.loaded_netrwPlugin = 1
 -- toggle quickfix window
 vim.keymap.set("n", "<leader>q", ":copen<CR>")
 
+-- enable true colors
+vim.o.termguicolors = true
+
 function ToggleQuickFix()
 	local function isQuickfixOpen()
 		local win_info_list = vim.fn.getwininfo()
@@ -260,11 +263,12 @@ end
 vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
 	{
-		"ellisonleao/gruvbox.nvim",
+		"folke/tokyonight.nvim",
 		lazy = false,
 		priority = 1000,
+		opts = {},
 		config = function()
-			vim.cmd([[colorscheme gruvbox]])
+			vim.cmd([[colorscheme tokyonight-night]])
 		end,
 	},
 
@@ -289,7 +293,6 @@ require("lazy").setup({
 					ignore = false,
 				},
 			})
-			vim.o.termguicolors = true
 		end,
 	},
 
@@ -386,19 +389,6 @@ require("lazy").setup({
 					i = {
 						["<c-t>"] = function(...)
 							return require("trouble.providers.telescope").open_with_trouble(...)
-						end,
-						["<a-t>"] = function(...)
-							return require("trouble.providers.telescope").open_selected_with_trouble(...)
-						end,
-						["<a-i>"] = function()
-							local action_state = require("telescope.actions.state")
-							local line = action_state.get_current_line()
-							Util.telescope("find_files", { no_ignore = true, default_text = line })()
-						end,
-						["<a-h>"] = function()
-							local action_state = require("telescope.actions.state")
-							local line = action_state.get_current_line()
-							Util.telescope("find_files", { hidden = true, default_text = line })()
 						end,
 						["<C-Down>"] = function(...)
 							return require("telescope.actions").cycle_history_next(...)
@@ -533,9 +523,6 @@ require("lazy").setup({
 				"tsserver",
 			})
 
-			-- Fix Undefined global 'vim'
-			lsp.nvim_lua_ls()
-
 			local cmp = require("cmp")
 			local cmp_select = { behavior = cmp.SelectBehavior.select }
 			local cmp_mappings = lsp.defaults.cmp_mappings({
@@ -615,6 +602,7 @@ require("lazy").setup({
 				},
 			})
 
+			require("lspconfig").lua_ls.setup(lsp.nvim_lua_ls())
 			lsp.setup()
 
 			-- config null-ls
