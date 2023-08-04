@@ -97,9 +97,6 @@ vim.o.background = "dark"
 vim.g.loaded = 1
 vim.g.loaded_netrwPlugin = 1
 
--- toggle quickfix window
-vim.keymap.set("n", "<leader>q", ":copen<CR>")
-
 -- enable true colors
 vim.o.termguicolors = true
 
@@ -160,8 +157,6 @@ vim.cmd([[
   nmap <silent> <leader>[ :tabprevious<cr>
   nmap <silent> <leader>] :tabnext<cr>
 
-  map <leader>c :Bclose<cr>:tabclose<cr>gT
-
   map <leader>tn :tabnew<cr>
   map <leader>to :tabonly<cr>
   map <leader>tc :tabclose<cr>
@@ -170,8 +165,6 @@ vim.cmd([[
 
   " Return to last edit position when opening files
   au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-
-  map <silent> <leader>qq :q<cr>
 
   " delete without yanking
   nnoremap <leader>d "_d
@@ -191,26 +184,6 @@ vim.cmd([[
 
   nnoremap q: <nop>
   nnoremap Q <nop>
-
-  command! Bclose call g:BufcloseCloseIt()
-  function! g:BufcloseCloseIt()
-    let l:currentBufNum = bufnr("%")
-    let l:alternateBufNum = bufnr("#")
-
-    if buflisted(l:alternateBufNum)
-      buffer #
-    else
-      bnext
-    endif
-
-    if bufnr("%") == l:currentBufNum
-      new
-    endif
-
-    if buflisted(l:currentBufNum)
-      execute("bdelete! ".l:currentBufNum)
-    endif
-  endfunction
 
   command! DeleteHiddenBuffers call g:DeleteHiddenBuffers()
   function! g:DeleteHiddenBuffers()
@@ -344,10 +317,10 @@ require("lazy").setup({
 				end,
 				offsets = {
 					{
-						filetype = "neo-tree",
-						text = "Neo-tree",
-						highlight = "Directory",
+						filetype = "NvimTree",
+						text = "File Explorer",
 						text_align = "left",
+						separator = true,
 					},
 				},
 			},
@@ -842,6 +815,26 @@ require("lazy").setup({
     	{ "<leader>snd", function() require("noice").cmd("dismiss") end, desc = "Dismiss All" },
     	{ "<c-f>", function() if not require("noice.lsp").scroll(4) then return "<c-f>" end end, silent = true, expr = true, desc = "Scroll forward", mode = {"i", "n", "s"} },
     	{ "<c-b>", function() if not require("noice.lsp").scroll(-4) then return "<c-b>" end end, silent = true, expr = true, desc = "Scroll backward", mode = {"i", "n", "s"}},
+		},
+	},
+
+	{
+		"echasnovski/mini.bufremove",
+		keys = {
+			{
+				"<leader>qq",
+				function()
+					require("mini.bufremove").delete(0, false)
+				end,
+				desc = "Delete Buffer",
+			},
+			{
+				"<leader>D",
+				function()
+					require("mini.bufremove").delete(0, true)
+				end,
+				desc = "Delete Buffer (Force)",
+			},
 		},
 	},
 }, {})
