@@ -100,26 +100,6 @@ vim.g.loaded_netrwPlugin = 1
 -- enable true colors
 vim.o.termguicolors = true
 
-function ToggleQuickFix()
-	local function isQuickfixOpen()
-		local win_info_list = vim.fn.getwininfo()
-		for _, win_info in ipairs(win_info_list) do
-			if win_info.quickfix == 1 then
-				return true
-			end
-		end
-		return false
-	end
-
-	if isQuickfixOpen() then
-		vim.cmd("cclose")
-	else
-		vim.cmd("copen")
-	end
-end
-
-vim.api.nvim_set_keymap("n", "<cr>", ":lua ToggleQuickFix()<CR>", { noremap = true, silent = true })
-
 vim.cmd([[
   set undodir=~/.vim_undo
   set undofile
@@ -236,12 +216,12 @@ end
 vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
 	{
-		"folke/tokyonight.nvim",
+		"bluz71/vim-nightfly-colors",
+		name = "nightfly",
 		lazy = false,
 		priority = 1000,
-		opts = {},
 		config = function()
-			vim.cmd([[colorscheme tokyonight-night]])
+			vim.cmd([[colorscheme nightfly]])
 		end,
 	},
 
