@@ -1,6 +1,6 @@
 export ZSH="$HOME/.oh-my-zsh"
 
-ZSH_THEME="pygmalion-virtualenv"
+ZSH_THEME="sonicradish"
 
 export PATH=$HOME/.npm-packages/bin:$HOME/.cargo/bin:$HOME/.local/bin:$HOME/bin:/opt/homebrew/bin:/opt/homebrew/sbin:$PATH
 
@@ -40,3 +40,18 @@ if [ -f /etc/env ]; then
 fi
 
 [ -f "/Users/chuangyu/.ghcup/env" ] && source "/Users/chuangyu/.ghcup/env" # ghcup-env
+
+# bun completions
+[ -s "/Users/chuangyu/.bun/_bun" ] && source "/Users/chuangyu/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# pnpm
+export PNPM_HOME="/Users/chuangyu/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
