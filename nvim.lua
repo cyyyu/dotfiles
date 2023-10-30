@@ -366,7 +366,7 @@ require("lazy").setup({
 			},
 		},
 		keys = {
-			{ "<leader>p", "<cmd>Telescope git_files<cr>", desc = "Git File" },
+			{ "<leader>p", "<cmd>Telescope fd<cr>", desc = "Git File" },
 			{ "<leader>b", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
 			{ "<leader>g", "<cmd>Telescope live_grep<cr>", desc = "Grep" },
 		},
