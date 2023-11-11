@@ -81,9 +81,6 @@ vim.o.stal = 2
 -- Use the system clipboard for yanking, pasting, etc.
 vim.o.clipboard = "unnamedplus"
 
--- Number of columns for the text wrap
-vim.o.cc = 80
-
 -- Always show the sign column
 vim.o.signcolumn = "yes"
 
@@ -851,5 +848,13 @@ require("lazy").setup({
 				},
 			})
 		end,
+	},
+
+	{
+		"Bekaboo/dropbar.nvim",
+		-- optional, but required for fuzzy finder support
+		dependencies = {
+			"nvim-telescope/telescope-fzf-native.nvim",
+		},
 	},
 }, {})
