@@ -216,12 +216,12 @@ end
 vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
 	{
-		"bluz71/vim-nightfly-colors",
-		name = "nightfly",
+		"folke/tokyonight.nvim",
 		lazy = false,
 		priority = 1000,
+		opts = {},
 		config = function()
-			vim.cmd([[colorscheme nightfly]])
+			vim.cmd("colorscheme tokyonight-night")
 		end,
 	},
 
