@@ -327,12 +327,14 @@ require("lazy").setup({
 
 	{
 		"nvim-telescope/telescope.nvim",
-		commit = vim.fn.has("nvim-0.9.0") == 0 and "057ee0f8783" or nil,
-		cmd = "Telescope",
-		version = false,
+		tag = "0.1.4",
 		dependencies = { "nvim-lua/plenary.nvim" },
 		opts = {
 			defaults = {
+				layout_strategy = "vertical",
+				layout_config = {
+				},
+				-- sorting_strategy = "ascending",
 				file_ignore_patterns = { "node_modules" },
 				prompt_prefix = " ",
 				selection_caret = " ",
