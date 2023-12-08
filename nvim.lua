@@ -331,9 +331,6 @@ require("lazy").setup({
 		dependencies = { "nvim-lua/plenary.nvim" },
 		opts = {
 			defaults = {
-				layout_strategy = "vertical",
-				layout_config = {
-				},
 				-- sorting_strategy = "ascending",
 				file_ignore_patterns = { "node_modules" },
 				prompt_prefix = " ",
