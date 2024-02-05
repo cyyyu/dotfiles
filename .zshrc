@@ -55,3 +55,7 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+
+if [ -f $HOME/.zshenv ]; then
+  source $HOME/.zshenv
+fi
