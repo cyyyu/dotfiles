@@ -665,18 +665,6 @@ require("lazy").setup({
 	},
 
 	{
-		"declancm/cinnamon.nvim",
-		config = function()
-			require("cinnamon").setup({
-				extra_keymaps = true,
-				extended_keymaps = true,
-				hide_cursor = true,
-				scroll_limit = 40,
-			})
-		end,
-	},
-
-	{
 		"mbbill/undotree",
 		config = function()
 			vim.keymap.set("n", "<leader>u", ":UndotreeToggle<CR>")
