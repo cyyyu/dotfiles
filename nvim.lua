@@ -402,11 +402,22 @@ require("lazy").setup({
 		"nvim-lualine/lualine.nvim",
 		dependencies = { "nvim-lua/lsp-status.nvim" },
 		config = function()
+			local function diff_source()
+				local gitsigns = vim.b.gitsigns_status_dict
+				if gitsigns then
+					return {
+						added = gitsigns.added,
+						modified = gitsigns.changed,
+						removed = gitsigns.removed,
+					}
+				end
+			end
+
 			require("lualine").setup({
 				extensions = { "nvim-tree" },
 				sections = {
 					lualine_a = { "mode" },
-					lualine_b = { "branch", "diff", 'require"lsp-status".status()' },
+					lualine_b = { { "diff", source = diff_source } },
 					lualine_x = { "filetype" },
 					lualine_y = { "progress" },
 					lualine_z = { "location" },
