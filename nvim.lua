@@ -230,20 +230,18 @@ require("lazy").setup({
 			{ "<c-n>", "<cmd>NvimTreeToggle<cr>", desc = "NvimTree" },
 			{ "<leader>v", "<cmd>NvimTreeFindFile<cr>", desc = "NvimTreeFindFile" },
 		},
-		config = function()
-			require("nvim-tree").setup({
-				sort_by = "case_sensitive",
-				view = {
-					width = 38,
-				},
-				renderer = {
-					root_folder_label = false,
-				},
-				git = {
-					ignore = false,
-				},
-			})
-		end,
+		opts = {
+			sort_by = "case_sensitive",
+			view = {
+				width = 38,
+			},
+			renderer = {
+				root_folder_label = false,
+			},
+			git = {
+				ignore = false,
+			},
+		},
 	},
 
 	{
@@ -328,7 +326,13 @@ require("lazy").setup({
 	{
 		"nvim-telescope/telescope.nvim",
 		tag = "0.1.6",
-		dependencies = { "nvim-lua/plenary.nvim" },
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			{
+				"nvim-telescope/telescope-fzf-native.nvim",
+				build = "make",
+			},
+		},
 		opts = {
 			defaults = {
 				-- sorting_strategy = "ascending",
@@ -360,12 +364,16 @@ require("lazy").setup({
 					},
 				},
 			},
+      extensions_list = { "fzf" },
 		},
 		keys = {
 			{ "<leader>p", "<cmd>Telescope fd<cr>", desc = "Git File" },
 			{ "<leader>b", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
 			{ "<leader>g", "<cmd>Telescope live_grep<cr>", desc = "Grep" },
 		},
+		config = function()
+			require("telescope").load_extension("fzf")
+		end,
 	},
 
 	-- search/replace in multiple files
