@@ -264,41 +264,13 @@ require("lazy").setup({
 	-- fancy tabs
 	{
 		"akinsho/bufferline.nvim",
-		event = "VeryLazy",
+		version = "*",
+		dependencies = "nvim-tree/nvim-web-devicons",
 		keys = {
 			{ "<leader>bp", "<Cmd>BufferLineTogglePin<CR>", desc = "Toggle pin" },
 			{ "<leader>bP", "<Cmd>BufferLineGroupClose ungrouped<CR>", desc = "Delete non-pinned buffers" },
 			{ "[b", "<Cmd>BufferLineCyclePrev<CR>", desc = "Previous buffer" },
 			{ "]b", "<Cmd>BufferLineCycleNext<CR>", desc = "Next buffer" },
-		},
-		opts = {
-			options = {
-      -- stylua: ignore
-      close_command = function(n) require("mini.bufremove").delete(n, false) end,
-      -- stylua: ignore
-      right_mouse_command = function(n) require("mini.bufremove").delete(n, false) end,
-				diagnostics = "nvim_lsp",
-				always_show_bufferline = false,
-				diagnostics_indicator = function(_, _, diag)
-					local icons = {
-						Error = " ",
-						Warn = " ",
-						Hint = " ",
-						Info = " ",
-					}
-					local ret = (diag.error and icons.Error .. diag.error .. " " or "")
-						.. (diag.warning and icons.Warn .. diag.warning or "")
-					return vim.trim(ret)
-				end,
-				offsets = {
-					{
-						filetype = "NvimTree",
-						text = "File Explorer",
-						text_align = "left",
-						separator = true,
-					},
-				},
-			},
 		},
 	},
 
@@ -364,7 +336,7 @@ require("lazy").setup({
 					},
 				},
 			},
-      extensions_list = { "fzf" },
+			extensions_list = { "fzf" },
 		},
 		keys = {
 			{ "<leader>p", "<cmd>Telescope fd<cr>", desc = "Git File" },
@@ -758,47 +730,31 @@ require("lazy").setup({
 		},
 	},
 
+	-- https://github.com/folke/noice.nvim
 	{
 		"folke/noice.nvim",
 		event = "VeryLazy",
-		dependencies = { "MunifTanjim/nui.nvim" },
 		opts = {
 			lsp = {
+				-- override markdown rendering so that **cmp** and other plugins use **Treesitter**
 				override = {
 					["vim.lsp.util.convert_input_to_markdown_lines"] = true,
 					["vim.lsp.util.stylize_markdown"] = true,
-					["cmp.entry.get_documentation"] = true,
+					["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
 				},
 			},
-			routes = {
-				{
-					filter = {
-						event = "msg_show",
-						any = {
-							{ find = "%d+L, %d+B" },
-							{ find = "; after #%d+" },
-							{ find = "; before #%d+" },
-						},
-					},
-					view = "mini",
-				},
-			},
+			-- you can enable a preset for easier configuration
 			presets = {
-				bottom_search = true,
-				command_palette = true,
-				long_message_to_split = true,
-				inc_rename = true,
+				bottom_search = true, -- use a classic bottom cmdline for search
+				command_palette = true, -- position the cmdline and popupmenu together
+				long_message_to_split = true, -- long messages will be sent to a split
+				inc_rename = false, -- enables an input dialog for inc-rename.nvim
+				lsp_doc_border = false, -- add a border to hover docs and signature help
 			},
 		},
-		-- stylua: ignore
-		keys = {
-			{ "<S-Enter>", function() require("noice").redirect(vim.fn.getcmdline()) end, mode = "c", desc = "Redirect Cmdline" },
-    	{ "<leader>snl", function() require("noice").cmd("last") end, desc = "Noice Last Message" },
-    	{ "<leader>snh", function() require("noice").cmd("history") end, desc = "Noice History" },
-    	{ "<leader>sna", function() require("noice").cmd("all") end, desc = "Noice All" },
-    	{ "<leader>snd", function() require("noice").cmd("dismiss") end, desc = "Dismiss All" },
-    	{ "<c-f>", function() if not require("noice.lsp").scroll(4) then return "<c-f>" end end, silent = true, expr = true, desc = "Scroll forward", mode = {"i", "n", "s"} },
-    	{ "<c-b>", function() if not require("noice.lsp").scroll(-4) then return "<c-b>" end end, silent = true, expr = true, desc = "Scroll backward", mode = {"i", "n", "s"}},
+		dependencies = {
+			"MunifTanjim/nui.nvim",
+			"rcarriga/nvim-notify",
 		},
 	},
 
