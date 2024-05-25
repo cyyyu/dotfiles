@@ -1,98 +1,43 @@
---General configs
-
--- Use space as the leader key
+-- General configs
 vim.g.mapleader = " "
 
--- Show line numbers
-vim.o.nu = true
-
--- Increase the size of the history
-vim.o.history = 1000
-
--- Enable writing of swap files
-vim.o.so = 1
-
--- Set the wildmode to longest:full and full
-vim.o.wildmode = "longest:full,full"
-
--- Ignore certain file types when using wildcards
-vim.o.wildignore = ".o,~,.pyc,/.git/,/.hg/,/.svn/,/.DS_Store,/node_modules/"
-
--- Allow < and > to move to the beginning and end of a line
-vim.o.whichwrap = vim.o.whichwrap .. "<,>,h,l"
-
--- Ignore case when searching
-vim.o.ignorecase = true
-
--- Use smart case when searching (case sensitive if uppercase)
-vim.o.smartcase = true
-
--- Show matching brackets
-vim.o.showmatch = true
-
--- Number of tenths of a second to show the matching bracket
-vim.o.mat = 2
-
--- Turn off all bells
-vim.o.belloff = "all"
-
--- Time in milliseconds to wait for a mapped sequence to complete
-vim.o.tm = 500
+-- Basic settings
+vim.opt.nu = true
+vim.opt.history = 1000
+vim.opt.swapfile = true
+vim.opt.wildmode = "longest:full,full"
+vim.opt.wildignore = ".o,~,.pyc,/.git/,/.hg/,/.svn/,/.DS_Store,/node_modules/"
+vim.opt.whichwrap:append("<,>,h,l")
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+vim.opt.ttyfast = true
+vim.opt.showmatch = true
+vim.opt.mat = 2
+vim.opt.belloff = "all"
+vim.opt.timeoutlen = 500
+vim.opt.encoding = "utf8"
+vim.opt.fileformats = "unix,dos,mac"
+vim.opt.expandtab = true
+vim.opt.tabstop = 2
+vim.opt.softtabstop = 2
+vim.opt.shiftwidth = 2
+vim.opt.linebreak = true
+vim.opt.textwidth = 500
+vim.opt.smartindent = true
+vim.opt.updatetime = 300
+vim.opt.switchbuf = "useopen,usetab,newtab"
+vim.opt.clipboard = "unnamedplus"
+vim.opt.signcolumn = "yes"
+vim.opt.cmdheight = 1
+vim.opt.background = "dark"
+vim.opt.termguicolors = true
 
 -- Automatically reload files when they change on disk
 vim.cmd("au FocusGained,BufEnter * checktime")
 
--- Set the encoding to UTF-8
-vim.o.encoding = "utf8"
-
--- Set the file format list to Unix, DOS, and Mac
-vim.o.ffs = "unix,dos,mac"
-
--- Expand tabs to spaces
-vim.o.expandtab = true
-
--- Number of spaces to use for each tab
-vim.o.tabstop = 2
-
--- Number of spaces to use for each tab in insert mode
-vim.o.softtabstop = 2
-
--- Insert line breaks
-vim.o.lbr = true
-
--- Set the text width to 500 characters
-vim.o.textwidth = 500
-
--- Use smart indentation
-vim.o.smartindent = true
-
--- Number of milliseconds of inactivity before updating the swap file
-vim.o.updatetime = 300
-
--- Switch to open buffer if possible when closing a buffer
-vim.o.switchbuf = "useopen,usetab,newtab"
-
--- Number of seconds to wait for a mapped sequence to complete
-vim.o.stal = 2
-
--- Use the system clipboard for yanking, pasting, etc.
-vim.o.clipboard = "unnamedplus"
-
--- Always show the sign column
-vim.o.signcolumn = "yes"
-
--- Height of the command-line
-vim.o.cmdheight = 1
-
--- Set the background to dark
-vim.o.background = "dark"
-
--- disable netrw and use nvim-tree instead
+-- Disable netrw and use nvim-tree instead
 vim.g.loaded = 1
 vim.g.loaded_netrwPlugin = 1
-
--- enable true colors
-vim.o.termguicolors = true
 
 vim.cmd([[
   set undodir=~/.vim_undo
@@ -245,12 +190,10 @@ require("lazy").setup({
 		"stevearc/dressing.nvim",
 		lazy = true,
 		init = function()
-			---@diagnostic disable-next-line: duplicate-set-field
 			vim.ui.select = function(...)
 				require("lazy").load({ plugins = { "dressing.nvim" } })
 				return vim.ui.select(...)
 			end
-			---@diagnostic disable-next-line: duplicate-set-field
 			vim.ui.input = function(...)
 				require("lazy").load({ plugins = { "dressing.nvim" } })
 				return vim.ui.input(...)
@@ -411,6 +354,28 @@ require("lazy").setup({
 	},
 
 	{
+		"nvim-treesitter/nvim-treesitter",
+		build = ":TSUpdate",
+		config = function()
+			require("nvim-treesitter.configs").setup({
+				ensure_installed = {
+					"javascript",
+					"typescript",
+					"lua",
+					"haskell",
+				},
+				sync_install = false,
+				auto_install = false,
+				highlight = { enable = true },
+				additional_vim_regex_highlighting = false,
+			})
+			vim.opt.foldlevel = 20
+			vim.opt.foldmethod = "expr"
+			vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+		end,
+	},
+
+	{
 		"VonHeikemen/lsp-zero.nvim",
 		branch = "v2.x",
 		dependencies = {
@@ -533,28 +498,6 @@ require("lazy").setup({
 	},
 
 	{
-		"nvim-treesitter/nvim-treesitter",
-		build = ":TSUpdate",
-		config = function()
-			require("nvim-treesitter.configs").setup({
-				ensure_installed = {
-					"javascript",
-					"typescript",
-					"lua",
-					"haskell",
-				},
-				sync_install = false,
-				auto_install = false,
-				highlight = { enable = true },
-				additional_vim_regex_highlighting = false,
-			})
-			vim.opt.foldlevel = 20
-			vim.opt.foldmethod = "expr"
-			vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
-		end,
-	},
-
-	{
 		"hrsh7th/nvim-cmp",
 		dependencies = {
 			"neovim/nvim-lspconfig",
@@ -572,9 +515,8 @@ require("lazy").setup({
 
 			cmp.setup({
 				snippet = {
-					-- REQUIRED - you must specify a snippet engine
 					expand = function(args)
-						vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+						vim.fn["vsnip#anonymous"](args.body)
 					end,
 				},
 				mapping = cmp.mapping.preset.insert({
@@ -591,7 +533,6 @@ require("lazy").setup({
 				}),
 			})
 
-			-- Use buffer source for `/` (if you enabled `native_menu`, this won"t work anymore).
 			cmp.setup.cmdline("/", {
 				mapping = cmp.mapping.preset.cmdline(),
 				sources = {
@@ -599,7 +540,6 @@ require("lazy").setup({
 				},
 			})
 
-			-- Use cmdline & path source for ":" (if you enabled `native_menu`, this won"t work anymore).
 			cmp.setup.cmdline(":", {
 				mapping = cmp.mapping.preset.cmdline(),
 				sources = cmp.config.sources({
@@ -664,7 +604,6 @@ require("lazy").setup({
 		"prisma/vim-prisma",
 	},
 
-	-- Automatically highlights other instances of the word under your cursor. This works with LSP, Treesitter, and regexp matching to find the other instances.
 	{
 		"RRethy/vim-illuminate",
 		event = { "BufReadPost", "BufNewFile" },
@@ -687,7 +626,6 @@ require("lazy").setup({
 			map("]]", "next")
 			map("[[", "prev")
 
-			-- also set it after loading ftplugins, since a lot overwrite [[ and ]]
 			vim.api.nvim_create_autocmd("FileType", {
 				callback = function()
 					local buffer = vim.api.nvim_get_current_buf()
@@ -702,26 +640,23 @@ require("lazy").setup({
 		},
 	},
 
-	-- https://github.com/folke/noice.nvim
 	{
 		"folke/noice.nvim",
 		event = "VeryLazy",
 		opts = {
 			lsp = {
-				-- override markdown rendering so that **cmp** and other plugins use **Treesitter**
 				override = {
 					["vim.lsp.util.convert_input_to_markdown_lines"] = true,
 					["vim.lsp.util.stylize_markdown"] = true,
-					["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
+					["cmp.entry.get_documentation"] = true,
 				},
 			},
-			-- you can enable a preset for easier configuration
 			presets = {
-				bottom_search = true, -- use a classic bottom cmdline for search
-				command_palette = true, -- position the cmdline and popupmenu together
-				long_message_to_split = true, -- long messages will be sent to a split
-				inc_rename = false, -- enables an input dialog for inc-rename.nvim
-				lsp_doc_border = false, -- add a border to hover docs and signature help
+				bottom_search = true,
+				command_palette = true,
+				long_message_to_split = true,
+				inc_rename = false,
+				lsp_doc_border = false,
 			},
 		},
 		dependencies = {
@@ -760,20 +695,17 @@ require("lazy").setup({
 					"*",
 				},
 				user_default_options = {
-					RGB = true, -- #RGB hex codes
-					RRGGBB = true, -- #RRGGBB hex codes
-					names = true, -- "Name" codes like Blue
-					RRGGBBAA = true, -- #RRGGBBAA hex codes
-					AARRGGBB = true, -- 0xAARRGGBB hex codes
-					rgb_fn = true, -- CSS rgb() and rgba() functions
-					hsl_fn = true, -- CSS hsl() and hsla() functions
-					css = true, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
-					css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
-					mode = "background", -- Set the display mode.
-					-- Available methods are false / true / "normal" / "lsp" / "both"
-					-- True is same as normal
-					tailwind = true, -- Enable tailwind colors
-					-- parsers can contain values used in |user_default_options|
+					RGB = true,
+					RRGGBB = true,
+					names = true,
+					RRGGBBAA = true,
+					AARRGGBB = true,
+					rgb_fn = true,
+					hsl_fn = true,
+					css = true,
+					css_fn = true,
+					mode = "background",
+					tailwind = true,
 					sass = {
 						enable = true,
 						parser = "css",
@@ -786,7 +718,6 @@ require("lazy").setup({
 
 	{
 		"Bekaboo/dropbar.nvim",
-		-- optional, but required for fuzzy finder support
 		dependencies = {
 			"nvim-telescope/telescope-fzf-native.nvim",
 		},
