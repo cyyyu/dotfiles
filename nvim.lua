@@ -27,9 +27,6 @@ vim.o.ignorecase = true
 -- Use smart case when searching (case sensitive if uppercase)
 vim.o.smartcase = true
 
--- Enable ttyfast for faster rendering
-vim.o.ttyfast = true
-
 -- Show matching brackets
 vim.o.showmatch = true
 
@@ -411,31 +408,6 @@ require("lazy").setup({
 		"lewis6991/gitsigns.nvim",
 		dependencies = { "nvim-lua/plenary.nvim" },
 		config = true,
-	},
-
-	{
-		"nvim-treesitter/nvim-treesitter",
-		config = function()
-			require("nvim-treesitter.configs").setup({
-				highlight = {
-					enable = true,
-					additional_vim_regex_highlighting = false,
-				},
-				auto_install = true,
-				ensure_installed = {
-					"javascript",
-					"typescript",
-					"lua",
-					"haskell",
-					"help",
-				},
-				sync_install = false,
-				additional_vim_regex_highlighting = false,
-			})
-			vim.opt.foldlevel = 20
-			vim.opt.foldmethod = "expr"
-			vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
-		end,
 	},
 
 	{
