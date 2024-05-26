@@ -375,127 +375,14 @@ require("lazy").setup({
 		end,
 	},
 
-	{
-		"VonHeikemen/lsp-zero.nvim",
-		branch = "v2.x",
-		dependencies = {
-			-- LSP Support
-			{ "neovim/nvim-lspconfig" }, -- Required
-			{
-				"williamboman/mason.nvim",
-				build = function()
-					pcall(vim.cmd, "MasonUpdate")
-				end,
-			},
-			{ "williamboman/mason-lspconfig.nvim" }, -- Optional
-			{ "hrsh7th/nvim-cmp" }, -- Required
-			{ "hrsh7th/cmp-nvim-lsp" }, -- Required
-			{ "L3MON4D3/LuaSnip" }, -- Required
-			{ "jose-elias-alvarez/null-ls.nvim" },
-		},
-		config = function()
-			local lsp = require("lsp-zero")
-			lsp.preset("recommended")
-			lsp.ensure_installed({
-				"tsserver",
-			})
-
-			local cmp = require("cmp")
-			local cmp_select = { behavior = cmp.SelectBehavior.select }
-			local cmp_mappings = lsp.defaults.cmp_mappings({
-				["C-p>"] = cmp.mapping.select_prev_item(cmp_select),
-				["C-n>"] = cmp.mapping.select_next_item(cmp_select),
-				["<C-Space>"] = cmp.mapping.complete(),
-				["<C-e>"] = cmp.mapping.close(),
-				["<C-l>"] = cmp.mapping.confirm({
-					behavior = cmp.ConfirmBehavior.insert,
-					select = true,
-				}),
-			})
-
-			cmp_mappings["<Tab>"] = nil
-			cmp_mappings["<S-Tab>"] = nil
-
-			lsp.set_preferences({
-				suggest_lsp_servers = false,
-				sign_icons = {
-					Error = "",
-					Warning = "",
-					Hint = "",
-					Information = "",
-				},
-			})
-			lsp.on_attach(function(client, bufnr)
-				local opts = { buffer = bufnr, remap = false }
-
-				vim.keymap.set("n", "gd", function()
-					vim.lsp.buf.definition()
-				end, opts)
-				vim.keymap.set("n", "gD", function()
-					vim.lsp.buf.declaration()
-				end, opts)
-				vim.keymap.set("n", "gi", function()
-					vim.lsp.buf.implementation()
-				end, opts)
-				vim.keymap.set("n", "gr", function()
-					vim.lsp.buf.references()
-				end, opts)
-				vim.keymap.set("n", "K", function()
-					vim.lsp.buf.hover()
-				end, opts)
-				vim.keymap.set("n", "[d", function()
-					vim.diagnostic.goto_prev()
-				end, opts)
-				vim.keymap.set("n", "]d", function()
-					vim.diagnostic.goto_next()
-				end, opts)
-				vim.keymap.set("n", "<leader>ca", function()
-					vim.lsp.buf.code_action()
-				end, opts)
-				vim.keymap.set("n", "<leader>rn", function()
-					vim.lsp.buf.rename()
-				end, opts)
-				vim.keymap.set("n", "<leader>e", function()
-					vim.diagnostic.open_float()
-				end, opts)
-			end)
-
-			lsp.format_mapping("<leader>f", {
-				format_opts = {
-					async = false,
-					timeout_ms = 10000,
-				},
-				servers = {
-					["null-ls"] = {
-						"javascript",
-						"typescript",
-						"javascriptreact",
-						"typescriptreact",
-						"lua",
-						"html",
-						"css",
-						"scss",
-					},
-				},
-			})
-
-			require("lspconfig").lua_ls.setup(lsp.nvim_lua_ls())
-			lsp.setup()
-
-			-- config null-ls
-			local null_ls = require("null-ls")
-			null_ls.setup({
-				sources = {
-					null_ls.builtins.formatting.stylua,
-					null_ls.builtins.formatting.prettierd,
-				},
-			})
-
-			vim.diagnostic.config({
-				virtual_text = true,
-			})
-		end,
-	},
+	{ "williamboman/mason.nvim" },
+	{ "williamboman/mason-lspconfig.nvim" },
+	{ "VonHeikemen/lsp-zero.nvim", branch = "v3.x" },
+	{ "neovim/nvim-lspconfig" },
+	{ "hrsh7th/cmp-nvim-lsp" },
+	{ "hrsh7th/nvim-cmp" },
+	{ "L3MON4D3/LuaSnip" },
+	{ "nvimtools/none-ls.nvim" },
 
 	{
 		"hrsh7th/nvim-cmp",
@@ -723,3 +610,96 @@ require("lazy").setup({
 		},
 	},
 }, {})
+
+local lsp_zero = require("lsp-zero")
+lsp_zero.on_attach(function(client, bufnr)
+	lsp_zero.default_keymaps({ buffer = bufnr })
+	local opts = { buffer = bufnr, remap = false }
+	vim.keymap.set("n", "gd", function()
+		vim.lsp.buf.definition()
+	end, opts)
+	vim.keymap.set("n", "gD", function()
+		vim.lsp.buf.declaration()
+	end, opts)
+	vim.keymap.set("n", "gi", function()
+		vim.lsp.buf.implementation()
+	end, opts)
+	vim.keymap.set("n", "gr", function()
+		vim.lsp.buf.references()
+	end, opts)
+	vim.keymap.set("n", "K", function()
+		vim.lsp.buf.hover()
+	end, opts)
+	vim.keymap.set("n", "[d", function()
+		vim.diagnostic.goto_prev()
+	end, opts)
+	vim.keymap.set("n", "]d", function()
+		vim.diagnostic.goto_next()
+	end, opts)
+	vim.keymap.set("n", "<leader>ca", function()
+		vim.lsp.buf.code_action()
+	end, opts)
+	vim.keymap.set("n", "<leader>rn", function()
+		vim.lsp.buf.rename()
+	end, opts)
+	vim.keymap.set("n", "<leader>e", function()
+		vim.diagnostic.open_float()
+	end, opts)
+
+	vim.api.nvim_set_keymap(
+		"n",
+		"<leader>f",
+		"<cmd>lua vim.lsp.buf.format({ async = true })<CR>",
+		{ noremap = true, silent = true }
+	)
+end)
+require("lspconfig").lua_ls.setup(lsp_zero.nvim_lua_ls())
+lsp_zero.setup()
+
+require("mason").setup({})
+require("mason-lspconfig").setup({
+	ensure_installed = {},
+	handlers = {
+		function(server_name)
+			require("lspconfig")[server_name].setup({})
+		end,
+	},
+})
+
+local cmp = require("cmp")
+local cmp_select = { behavior = cmp.SelectBehavior.select }
+local cmp_mappings = lsp_zero.defaults.cmp_mappings({
+	["C-p>"] = cmp.mapping.select_prev_item(cmp_select),
+	["C-n>"] = cmp.mapping.select_next_item(cmp_select),
+	["<C-Space>"] = cmp.mapping.complete(),
+	["<C-e>"] = cmp.mapping.close(),
+	["<C-l>"] = cmp.mapping.confirm({
+		behavior = cmp.ConfirmBehavior.insert,
+		select = true,
+	}),
+})
+
+cmp_mappings["<Tab>"] = nil
+cmp_mappings["<S-Tab>"] = nil
+
+local null_ls = require("null-ls")
+null_ls.setup({
+	sources = {
+		null_ls.builtins.formatting.stylua.with({
+			filetypes = {
+				"lua",
+			},
+		}),
+		null_ls.builtins.formatting.prettierd.with({
+			filetypes = {
+				"javascript",
+				"typescript",
+				"javascriptreact",
+				"typescriptreact",
+				"html",
+				"css",
+				"scss",
+			},
+		}),
+	},
+})
