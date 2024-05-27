@@ -39,22 +39,25 @@ vim.cmd("au FocusGained,BufEnter * checktime")
 vim.g.loaded = 1
 vim.g.loaded_netrwPlugin = 1
 
+-- Persistent undo
+vim.opt.undodir = vim.fn.expand("~/.vim_undo")
+vim.opt.undofile = true
+
+-- Correct jsx/tsx filetype
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+	pattern = { "*.jsx", "*.tsx" },
+	callback = function(event)
+		local ft = event.match:match("%.tsx$") and "typescriptreact" or "javascriptreact"
+		vim.api.nvim_buf_set_option(event.buf, "filetype", ft)
+	end,
+})
+
+-- Filetype plugin indent on
+vim.cmd("filetype plugin indent on")
+
+-- Custom commands and key mappings
 vim.cmd([[
-  set undodir=~/.vim_undo
-  set undofile
-
-  " Correct jsx/tsx filetype
-  augroup ReactFiletypes
-    autocmd!
-    autocmd BufRead,BufNewFile *.jsx set filetype=javascriptreact
-    autocmd BufRead,BufNewFile *.tsx set filetype=typescriptreact
-  augroup END
-
-  filetype plugin indent on
   command W w !sudo tee % > /dev/null
-
-  syntax enable
-
   cnoremap <C-a> <Home>
   cnoremap <C-e> <End>
   cnoremap <C-p> <Up>
@@ -62,62 +65,31 @@ vim.cmd([[
   cnoremap <C-b> <Left>
   cnoremap <C-f> <Right>
   cnoremap <C-d> <Del>
-
-  vnoremap <silent> * :<C-u>call VisualSelection('', '')<CR>/<C-R>=@/<CR><CR>
-  vnoremap <silent> # :<C-u>call VisualSelection('', '')<CR>?<C-R>=@/<CR><CR>
-
   map <silent> <leader><cr> :noh<cr>
-
   map <C-j> <C-W>j
   map <C-k> <C-W>k
   map <C-h> <C-W>h
   map <C-l> <C-W>l
-
   nmap <silent> <leader>[ :tabprevious<cr>
   nmap <silent> <leader>] :tabnext<cr>
-
   map <leader>tn :tabnew<cr>
   map <leader>to :tabonly<cr>
   map <leader>tc :tabclose<cr>
-
   map <leader>qn :cn<cr>
-
-  " Return to last edit position when opening files
   au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-
-  " delete without yanking
   nnoremap <leader>d "_d
   vnoremap <leader>d "_d
-  " replace currently selected text with default register
-  " without yanking it
   vnoremap <leader>P "_dP
-
-  " resize window
   nnoremap <silent> <leader>1 :resize -12<cr>
   nnoremap <silent> <leader>2 :resize +12<cr>
   nnoremap <silent> <leader>3 :vertical resize -6<cr>
   nnoremap <silent> <leader>4 :vertical resize +6<cr>
-
-  " To reload file
   map <silent> <leader>r :checktime<CR>
-
   nnoremap q: <nop>
   nnoremap Q <nop>
 
-  command! DeleteHiddenBuffers call g:DeleteHiddenBuffers()
-  function! g:DeleteHiddenBuffers()
-    let tpbl=[]
-    call map(range(1, tabpagenr('$')), 'extend(tpbl, tabpagebuflist(v:val))')
-    for buf in filter(range(1, bufnr('$')), 'bufexists(v:val) && index(tpbl, v:val)==-1')
-      if getbufvar(buf, '&mod') == 0
-        silent execute 'bwipeout' buf
-      endif
-    endfor
-  endfunction
-
-  function! CmdLine(str)
-    call feedkeys(":" . a:str)
-  endfunction
+  vnoremap <silent> * :<C-u>call VisualSelection('', '')<CR>/<C-R>=@/<CR><CR>
+  vnoremap <silent> # :<C-u>call VisualSelection('', '')<CR>?<C-R>=@/<CR><CR>
 
   function! VisualSelection(direction, extra_filter) range
     let l:saved_reg = @"
@@ -135,8 +107,28 @@ vim.cmd([[
     let @/ = l:pattern
     let @" = l:saved_reg
   endfunction
+
+  function! CmdLine(str)
+    call feedkeys(":" . a:str)
+  endfunction
 ]])
 
+-- Custom functions
+local function delete_hidden_buffers()
+	local tpbl = {}
+	for i = 1, vim.fn.tabpagenr("$") do
+		vim.list_extend(tpbl, vim.fn.tabpagebuflist(i))
+	end
+	for buf = 1, vim.fn.bufnr("$") do
+		if vim.fn.bufexists(buf) == 1 and vim.fn.index(tpbl, buf) == -1 and vim.fn.getbufvar(buf, "&mod") == 0 then
+			vim.cmd("bwipeout " .. buf)
+		end
+	end
+end
+
+vim.api.nvim_create_user_command("DeleteHiddenBuffers", delete_hidden_buffers, {})
+
+-- Keymaps
 vim.keymap.set("n", "<leader>w", "<cmd>w!<CR>")
 
 -- End general configs
@@ -153,17 +145,16 @@ if not vim.loop.fs_stat(lazypath) then
 	})
 end
 vim.opt.rtp:prepend(lazypath)
+
 require("lazy").setup({
 	{
 		"folke/tokyonight.nvim",
 		lazy = false,
 		priority = 1000,
-		opts = {},
 		config = function()
 			vim.cmd("colorscheme tokyonight-night")
 		end,
 	},
-
 	{
 		"kyazdani42/nvim-tree.lua",
 		lazy = true,
@@ -174,18 +165,11 @@ require("lazy").setup({
 		},
 		opts = {
 			sort_by = "case_sensitive",
-			view = {
-				width = 38,
-			},
-			renderer = {
-				root_folder_label = false,
-			},
-			git = {
-				ignore = false,
-			},
+			view = { width = 38 },
+			renderer = { root_folder_label = false },
+			git = { ignore = false },
 		},
 	},
-
 	{
 		"stevearc/dressing.nvim",
 		lazy = true,
@@ -200,8 +184,6 @@ require("lazy").setup({
 			end
 		end,
 	},
-
-	-- fancy tabs
 	{
 		"akinsho/bufferline.nvim",
 		version = "*",
@@ -213,19 +195,15 @@ require("lazy").setup({
 			{ "]b", "<Cmd>BufferLineCycleNext<CR>", desc = "Next buffer" },
 		},
 	},
-
 	"mattn/emmet-vim",
 	"sheerun/vim-polyglot",
-
 	{
 		"scrooloose/nerdcommenter",
 		config = function()
 			vim.g.NERDSpaceDelims = 1
 		end,
 	},
-
 	{ "windwp/nvim-autopairs", config = true },
-
 	{
 		"lukas-reineke/indent-blankline.nvim",
 		main = "ibl",
@@ -234,20 +212,15 @@ require("lazy").setup({
 			require("ibl").setup()
 		end,
 	},
-
 	{
 		"nvim-telescope/telescope.nvim",
 		tag = "0.1.6",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
-			{
-				"nvim-telescope/telescope-fzf-native.nvim",
-				build = "make",
-			},
+			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
 		},
 		opts = {
 			defaults = {
-				-- sorting_strategy = "ascending",
 				file_ignore_patterns = { "node_modules" },
 				prompt_prefix = " ",
 				selection_caret = " ",
@@ -287,8 +260,6 @@ require("lazy").setup({
 			require("telescope").load_extension("fzf")
 		end,
 	},
-
-	-- search/replace in multiple files
 	{
 		"nvim-pack/nvim-spectre",
 		cmd = "Spectre",
@@ -303,21 +274,18 @@ require("lazy").setup({
 			},
 		},
 	},
-
 	{
 		"zivyangll/git-blame.vim",
 		config = function()
 			vim.keymap.set("n", "<leader>s", "<cmd>call gitblame#echo()<cr>")
 		end,
 	},
-
 	{
 		"tikhomirov/vim-glsl",
 		config = function()
 			vim.cmd("autocmd! BufNewFile,BufRead *.vs,*.fs set ft=glsl")
 		end,
 	},
-
 	{
 		"nvim-lualine/lualine.nvim",
 		dependencies = { "nvim-lua/lsp-status.nvim" },
@@ -332,7 +300,6 @@ require("lazy").setup({
 					}
 				end
 			end
-
 			require("lualine").setup({
 				extensions = { "nvim-tree" },
 				sections = {
@@ -346,13 +313,11 @@ require("lazy").setup({
 			})
 		end,
 	},
-
 	{
 		"lewis6991/gitsigns.nvim",
 		dependencies = { "nvim-lua/plenary.nvim" },
 		config = true,
 	},
-
 	{
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
@@ -374,31 +339,92 @@ require("lazy").setup({
 			vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
 		end,
 	},
-
-	{ "williamboman/mason.nvim" },
-	{ "williamboman/mason-lspconfig.nvim" },
-	{ "VonHeikemen/lsp-zero.nvim", branch = "v3.x" },
-	{ "neovim/nvim-lspconfig" },
-	{ "hrsh7th/cmp-nvim-lsp" },
-	{ "hrsh7th/nvim-cmp" },
-	{ "L3MON4D3/LuaSnip" },
-	{ "nvimtools/none-ls.nvim" },
+	{
+		"williamboman/mason.nvim",
+		config = true,
+	},
+	{
+		"williamboman/mason-lspconfig.nvim",
+		dependencies = {
+			"williamboman/mason.nvim",
+			"neovim/nvim-lspconfig",
+		},
+		config = true,
+	},
 
 	{
-		"hrsh7th/nvim-cmp",
+		"VonHeikemen/lsp-zero.nvim",
+		branch = "v3.x",
 		dependencies = {
 			"neovim/nvim-lspconfig",
+			"williamboman/mason-lspconfig.nvim",
+			"williamboman/mason.nvim",
 			"hrsh7th/cmp-nvim-lsp",
+			"hrsh7th/nvim-cmp",
 			"hrsh7th/cmp-buffer",
 			"hrsh7th/cmp-path",
 			"hrsh7th/cmp-cmdline",
 			"hrsh7th/cmp-vsnip",
 			"hrsh7th/vim-vsnip",
+			"L3MON4D3/LuaSnip",
+			"nvimtools/none-ls.nvim",
 		},
 		config = function()
-			vim.cmd([[set completeopt=menu,menuone,noselect]])
+			local lsp_zero = require("lsp-zero")
+			lsp_zero.on_attach(function(client, bufnr)
+				lsp_zero.default_keymaps({ buffer = bufnr })
+				local opts = { buffer = bufnr, remap = false }
+				vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+				vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
+				vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
+				vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+				vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+				vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
+				vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
+				vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+				vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+				vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, opts)
+				vim.api.nvim_set_keymap(
+					"n",
+					"<leader>f",
+					"<cmd>lua vim.lsp.buf.format({ async = true })<CR>",
+					{ noremap = true, silent = true }
+				)
+			end)
+			require("lspconfig").lua_ls.setup(lsp_zero.nvim_lua_ls())
+			lsp_zero.setup()
+
+			require("mason").setup({
+				ui = {
+					icons = {
+						package_installed = "✓",
+						package_pending = "➜",
+						package_uninstalled = "✗",
+					},
+				},
+			})
+
+			require("mason-lspconfig").setup({
+				ensure_installed = { "lua_ls", "tsserver", "eslint" },
+				automatic_installation = true,
+				handlers = {
+					function(server_name)
+						require("lspconfig")[server_name].setup({})
+					end,
+				},
+			})
 
 			local cmp = require("cmp")
+			local cmp_select = { behavior = cmp.SelectBehavior.select }
+			local cmp_mappings = lsp_zero.defaults.cmp_mappings({
+				["<C-p>"] = cmp.mapping.select_prev_item(cmp_select),
+				["<C-n>"] = cmp.mapping.select_next_item(cmp_select),
+				["<C-Space>"] = cmp.mapping.complete(),
+				["<C-e>"] = cmp.mapping.close(),
+				["<C-l>"] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.insert, select = true }),
+			})
+			cmp_mappings["<Tab>"] = nil
+			cmp_mappings["<S-Tab>"] = nil
 
 			cmp.setup({
 				snippet = {
@@ -406,12 +432,7 @@ require("lazy").setup({
 						vim.fn["vsnip#anonymous"](args.body)
 					end,
 				},
-				mapping = cmp.mapping.preset.insert({
-					["<C-u>"] = cmp.mapping.scroll_docs(-4),
-					["<C-d>"] = cmp.mapping.scroll_docs(4),
-					["<C-e>"] = cmp.mapping.abort(),
-					["<C-l>"] = cmp.mapping.confirm({ select = true }),
-				}),
+				mapping = cmp_mappings,
 				sources = cmp.config.sources({
 					{ name = "nvim_lsp" },
 					{ name = "vsnip" },
@@ -422,11 +443,8 @@ require("lazy").setup({
 
 			cmp.setup.cmdline("/", {
 				mapping = cmp.mapping.preset.cmdline(),
-				sources = {
-					{ name = "buffer" },
-				},
+				sources = { { name = "buffer" } },
 			})
-
 			cmp.setup.cmdline(":", {
 				mapping = cmp.mapping.preset.cmdline(),
 				sources = cmp.config.sources({
@@ -435,9 +453,26 @@ require("lazy").setup({
 					{ name = "cmdline" },
 				}),
 			})
+
+			local null_ls = require("null-ls")
+			null_ls.setup({
+				sources = {
+					null_ls.builtins.formatting.stylua.with({ filetypes = { "lua" } }),
+					null_ls.builtins.formatting.prettierd.with({
+						filetypes = {
+							"javascript",
+							"typescript",
+							"javascriptreact",
+							"typescriptreact",
+							"html",
+							"css",
+							"scss",
+						},
+					}),
+				},
+			})
 		end,
 	},
-
 	{
 		"nguyenvukhang/nvim-toggler",
 		config = function()
@@ -453,14 +488,12 @@ require("lazy").setup({
 			})
 		end,
 	},
-
 	{
 		"mbbill/undotree",
 		config = function()
 			vim.keymap.set("n", "<leader>u", ":UndotreeToggle<CR>")
 		end,
 	},
-
 	{
 		"ggandor/leap.nvim",
 		config = function()
@@ -468,7 +501,6 @@ require("lazy").setup({
 			vim.keymap.set("n", "S", "<Plug>(leap-backward)", { noremap = true })
 		end,
 	},
-
 	{
 		"Exafunction/codeium.vim",
 		config = function()
@@ -486,11 +518,7 @@ require("lazy").setup({
 			end, { expr = true })
 		end,
 	},
-
-	{
-		"prisma/vim-prisma",
-	},
-
+	{ "prisma/vim-prisma" },
 	{
 		"RRethy/vim-illuminate",
 		event = { "BufReadPost", "BufNewFile" },
@@ -503,16 +531,13 @@ require("lazy").setup({
 		},
 		config = function(_, opts)
 			require("illuminate").configure(opts)
-
 			local function map(key, dir, buffer)
 				vim.keymap.set("n", key, function()
 					require("illuminate")["goto_" .. dir .. "_reference"](false)
 				end, { desc = dir:sub(1, 1):upper() .. dir:sub(2) .. " Reference", buffer = buffer })
 			end
-
 			map("]]", "next")
 			map("[[", "prev")
-
 			vim.api.nvim_create_autocmd("FileType", {
 				callback = function()
 					local buffer = vim.api.nvim_get_current_buf()
@@ -526,7 +551,6 @@ require("lazy").setup({
 			{ "[[", desc = "Prev Reference" },
 		},
 	},
-
 	{
 		"folke/noice.nvim",
 		event = "VeryLazy",
@@ -551,7 +575,6 @@ require("lazy").setup({
 			"rcarriga/nvim-notify",
 		},
 	},
-
 	{
 		"echasnovski/mini.bufremove",
 		keys = {
@@ -571,16 +594,12 @@ require("lazy").setup({
 			},
 		},
 	},
-
 	{ "kevinhwang91/nvim-bqf", ft = "qf" },
-
 	{
 		"NvChad/nvim-colorizer.lua",
 		config = function()
 			require("colorizer").setup({
-				filetypes = {
-					"*",
-				},
+				filetypes = { "*" },
 				user_default_options = {
 					RGB = true,
 					RRGGBB = true,
@@ -593,113 +612,14 @@ require("lazy").setup({
 					css_fn = true,
 					mode = "background",
 					tailwind = true,
-					sass = {
-						enable = true,
-						parser = "css",
-					},
+					sass = { enable = true, parser = "css" },
 					always_update = true,
 				},
 			})
 		end,
 	},
-
 	{
 		"Bekaboo/dropbar.nvim",
-		dependencies = {
-			"nvim-telescope/telescope-fzf-native.nvim",
-		},
+		dependencies = { "nvim-telescope/telescope-fzf-native.nvim" },
 	},
 }, {})
-
-local lsp_zero = require("lsp-zero")
-lsp_zero.on_attach(function(client, bufnr)
-	lsp_zero.default_keymaps({ buffer = bufnr })
-	local opts = { buffer = bufnr, remap = false }
-	vim.keymap.set("n", "gd", function()
-		vim.lsp.buf.definition()
-	end, opts)
-	vim.keymap.set("n", "gD", function()
-		vim.lsp.buf.declaration()
-	end, opts)
-	vim.keymap.set("n", "gi", function()
-		vim.lsp.buf.implementation()
-	end, opts)
-	vim.keymap.set("n", "gr", function()
-		vim.lsp.buf.references()
-	end, opts)
-	vim.keymap.set("n", "K", function()
-		vim.lsp.buf.hover()
-	end, opts)
-	vim.keymap.set("n", "[d", function()
-		vim.diagnostic.goto_prev()
-	end, opts)
-	vim.keymap.set("n", "]d", function()
-		vim.diagnostic.goto_next()
-	end, opts)
-	vim.keymap.set("n", "<leader>ca", function()
-		vim.lsp.buf.code_action()
-	end, opts)
-	vim.keymap.set("n", "<leader>rn", function()
-		vim.lsp.buf.rename()
-	end, opts)
-	vim.keymap.set("n", "<leader>e", function()
-		vim.diagnostic.open_float()
-	end, opts)
-
-	vim.api.nvim_set_keymap(
-		"n",
-		"<leader>f",
-		"<cmd>lua vim.lsp.buf.format({ async = true })<CR>",
-		{ noremap = true, silent = true }
-	)
-end)
-require("lspconfig").lua_ls.setup(lsp_zero.nvim_lua_ls())
-lsp_zero.setup()
-
-require("mason").setup({})
-require("mason-lspconfig").setup({
-	ensure_installed = {},
-	handlers = {
-		function(server_name)
-			require("lspconfig")[server_name].setup({})
-		end,
-	},
-})
-
-local cmp = require("cmp")
-local cmp_select = { behavior = cmp.SelectBehavior.select }
-local cmp_mappings = lsp_zero.defaults.cmp_mappings({
-	["C-p>"] = cmp.mapping.select_prev_item(cmp_select),
-	["C-n>"] = cmp.mapping.select_next_item(cmp_select),
-	["<C-Space>"] = cmp.mapping.complete(),
-	["<C-e>"] = cmp.mapping.close(),
-	["<C-l>"] = cmp.mapping.confirm({
-		behavior = cmp.ConfirmBehavior.insert,
-		select = true,
-	}),
-})
-
-cmp_mappings["<Tab>"] = nil
-cmp_mappings["<S-Tab>"] = nil
-
-local null_ls = require("null-ls")
-null_ls.setup({
-	sources = {
-		null_ls.builtins.formatting.stylua.with({
-			filetypes = {
-				"lua",
-			},
-		}),
-		null_ls.builtins.formatting.prettierd.with({
-			filetypes = {
-				"javascript",
-				"typescript",
-				"javascriptreact",
-				"typescriptreact",
-				"html",
-				"css",
-				"scss",
-			},
-		}),
-	},
-})
