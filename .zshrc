@@ -28,12 +28,10 @@ commitall() {
   echo "Do you want to proceed with this commit message? (Press Enter to confirm, any other key to cancel): "
   vared -p "> " -c confirm
 
-  echo "User input: '$confirm'" 
-
   if [ -z "$confirm" ]; then
     git add .
     git commit -m "$msg"
-    echo "Committed with message: $msg"
+    echo "Committed."
   else
     echo "Commit aborted."
   fi
