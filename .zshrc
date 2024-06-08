@@ -19,9 +19,14 @@ alias dc=docker-compose
 alias rgf='rg --files | rg'
 alias v=nvim
 alias i='ai -i'
-alias commit='git add . && git commit -m'
-
 alias aicommit="ai -p 'I want you to act as a commit message generator. I will provide you with information organized in a custom git-diff format. Your task is to generate an appropriate commit message using the conventional git commit format. Reply only with the commit message itself and nothing else.'"
+
+commitall() {
+  msg=$(git diff | aicommit)
+  git add .
+  git commit -m "$msg"
+  echo "$msg"
+}
 
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden'
 
