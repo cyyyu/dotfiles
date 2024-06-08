@@ -23,9 +23,20 @@ alias aicommit="ai -p 'I want you to act as a commit message generator. I will p
 
 commitall() {
   msg=$(git diff | aicommit)
-  git add .
-  git commit -m "$msg"
-  echo "$msg"
+
+  echo -e "Generated commit message:\n\033[1;32m$msg\033[0m"
+  echo "Do you want to proceed with this commit message? (Press Enter to confirm, any other key to cancel): "
+  vared -p "> " -c confirm
+
+  echo "User input: '$confirm'" 
+
+  if [ -z "$confirm" ]; then
+    git add .
+    git commit -m "$msg"
+    echo "Committed with message: $msg"
+  else
+    echo "Commit aborted."
+  fi
 }
 
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden'
