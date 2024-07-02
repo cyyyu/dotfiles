@@ -19,10 +19,12 @@ alias dc=docker-compose
 alias rgf='rg --files | rg'
 alias v=nvim
 alias i='ai -i'
-alias aicommit="ai -p 'I want you to act as a commit message generator. I will provide you with information organized in a custom git-diff format. Your task is to generate an appropriate commit message using the conventional git commit format. Reply only with the commit message itself and nothing else.'"
+alias aicommit="ai -p 'I want you to act as a commit message generator. I will provide you with information organized in a custom git status and git diff format. Your task is to generate an appropriate commit message using the conventional git commit format. Reply only with the commit message itself and nothing else.'"
 
 commitall() {
-  msg=$(git diff | aicommit)
+  # Combine the output of git status and git diff, and pipe it to aicommit
+  combined_output=$(git status && git diff)
+  msg=$(echo "$combined_output" | aicommit)
 
   echo -e "Generated commit message:\n\033[1;32m$msg\033[0m"
   echo "Do you want to proceed with this commit message? (Press Enter to confirm, any other key to cancel): "
