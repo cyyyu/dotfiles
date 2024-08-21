@@ -55,6 +55,14 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
 -- Filetype plugin indent on
 vim.cmd("filetype plugin indent on")
 
+-- Auto-reload vimrc
+vim.cmd([[
+  augroup config_reload
+    autocmd!
+    autocmd BufWritePost $MYVIMRC source $MYVIMRC
+  augroup end
+]])
+
 -- Custom commands and key mappings
 vim.cmd([[
   command W w !sudo tee % > /dev/null
