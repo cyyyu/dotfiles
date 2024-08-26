@@ -654,4 +654,37 @@ require("lazy").setup({
 		"Bekaboo/dropbar.nvim",
 		dependencies = { "nvim-telescope/telescope-fzf-native.nvim" },
 	},
+
+	{
+		"yetone/avante.nvim",
+		event = "VeryLazy",
+		build = "make",
+		opts = {
+			provider = "azure",
+			azure = {
+				endpoint = "https://chuanggpt.openai.azure.com",
+				deployment = "gpt4o",
+				api_version = "2024-06-01",
+				timeout = 30000,
+				temperature = 0,
+				max_tokens = 4096,
+				["local"] = false,
+			},
+			-- add any opts here
+		},
+		dependencies = {
+			"nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
+			"stevearc/dressing.nvim",
+			"nvim-lua/plenary.nvim",
+			"MunifTanjim/nui.nvim",
+			--- The below is optional, make sure to setup it properly if you have lazy=true
+			{
+				"MeanderingProgrammer/render-markdown.nvim",
+				opts = {
+					file_types = { "markdown", "Avante" },
+				},
+				ft = { "markdown", "Avante" },
+			},
+		},
+	},
 }, {})
