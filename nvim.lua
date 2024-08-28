@@ -1,4 +1,5 @@
 -- General configs
+local vim = vim
 vim.g.mapleader = " "
 
 -- Basic settings
@@ -608,21 +609,31 @@ require("lazy").setup({
 		end,
 	},
 	{
-		"echasnovski/mini.bufremove",
-		keys = {
-			{
-				"<leader>qq",
-				function()
-					require("mini.bufremove").delete(0, false)
-				end,
-				desc = "Delete Buffer",
-			},
-			{
-				"<leader>D",
-				function()
-					require("mini.bufremove").delete(0, true)
-				end,
-				desc = "Delete Buffer (Force)",
+		{
+			"echasnovski/mini.bufremove",
+			keys = {
+				{
+					"<leader>qq",
+					function()
+						if #vim.fn.getbufinfo({ buflisted = 1 }) == 1 then
+							vim.cmd("qa")
+						else
+							require("mini.bufremove").delete(0, false)
+						end
+					end,
+					desc = "Delete Buffer",
+				},
+				{
+					"<leader>D",
+					function()
+						if #vim.fn.getbufinfo({ buflisted = 1 }) == 1 then
+							vim.cmd("qa")
+						else
+							require("mini.bufremove").delete(0, true)
+						end
+					end,
+					desc = "Delete Buffer (Force)",
+				},
 			},
 		},
 	},
