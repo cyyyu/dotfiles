@@ -225,51 +225,49 @@ require("lazy").setup({
 	},
 	{
 		"nvim-telescope/telescope.nvim",
-		tag = "0.1.7",
+		tag = "0.1.8",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
-			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
-		},
-		opts = {
-			defaults = {
-				file_ignore_patterns = { "node_modules" },
-				prompt_prefix = " ",
-				selection_caret = " ",
-				mappings = {
-					i = {
-						["<c-t>"] = function(...)
-							return require("trouble.providers.telescope").open_with_trouble(...)
-						end,
-						["<C-Down>"] = function(...)
-							return require("telescope.actions").cycle_history_next(...)
-						end,
-						["<C-Up>"] = function(...)
-							return require("telescope.actions").cycle_history_prev(...)
-						end,
-						["<C-f>"] = function(...)
-							return require("telescope.actions").preview_scrolling_down(...)
-						end,
-						["<C-b>"] = function(...)
-							return require("telescope.actions").preview_scrolling_up(...)
-						end,
-					},
-					n = {
-						["q"] = function(...)
-							return require("telescope.actions").close(...)
-						end,
-					},
-				},
-			},
-			extensions_list = { "fzf" },
-		},
-		keys = {
-			{ "<leader>p", "<cmd>Telescope fd<cr>", desc = "Git File" },
-			{ "<leader>b", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
-			{ "<leader>g", "<cmd>Telescope live_grep<cr>", desc = "Grep" },
 		},
 		config = function()
-			require("telescope").load_extension("fzf")
+			require("telescope").setup({
+				{
+					defaults = {
+						file_ignore_patterns = { "node_modules" },
+						prompt_prefix = " ",
+						selection_caret = " ",
+						mappings = {
+							i = {
+								["<c-t>"] = function(...)
+									return require("trouble.providers.telescope").open_with_trouble(...)
+								end,
+								["<C-Down>"] = function(...)
+									return require("telescope.actions").cycle_history_next(...)
+								end,
+								["<C-Up>"] = function(...)
+									return require("telescope.actions").cycle_history_prev(...)
+								end,
+								["<C-f>"] = function(...)
+									return require("telescope.actions").preview_scrolling_down(...)
+								end,
+								["<C-b>"] = function(...)
+									return require("telescope.actions").preview_scrolling_up(...)
+								end,
+							},
+							n = {
+								["q"] = function(...)
+									return require("telescope.actions").close(...)
+								end,
+							},
+						},
+					},
+				},
+			})
 		end,
+
+		vim.keymap.set("n", "<leader>p", "<cmd>Telescope fd theme=get_ivy<cr>"),
+		vim.keymap.set("n", "<leader>b", "<cmd>Telescope buffers theme=get_ivy<cr>"),
+		vim.keymap.set("n", "<leader>g", "<cmd>Telescope live_grep theme=get_ivy<cr>"),
 	},
 	{
 		"nvim-pack/nvim-spectre",
@@ -663,7 +661,6 @@ require("lazy").setup({
 	},
 	{
 		"Bekaboo/dropbar.nvim",
-		dependencies = { "nvim-telescope/telescope-fzf-native.nvim" },
 	},
 
 	{
