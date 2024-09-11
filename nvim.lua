@@ -336,7 +336,6 @@ require("lazy").setup({
 					"javascript",
 					"typescript",
 					"lua",
-					"haskell",
 				},
 				sync_install = false,
 				auto_install = false,
@@ -391,7 +390,9 @@ require("lazy").setup({
 				vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
 				vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
 				vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
-				vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+				vim.keymap.set("n", "<leader>si", function()
+					vim.lsp.buf.code_action({ context = { only = { "source.organizeImports" } } })
+				end, opts)
 				vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, opts)
 				vim.api.nvim_set_keymap(
 					"n",
@@ -418,7 +419,15 @@ require("lazy").setup({
 				automatic_installation = true,
 				handlers = {
 					function(server_name)
-						require("lspconfig")[server_name].setup({})
+						-- https://github.com/neovim/nvim-lspconfig/pull/3232
+						if server_name == "tsserver" then
+							server_name = "ts_ls"
+						end
+						local capabilities = require("cmp_nvim_lsp").default_capabilities()
+						require("lspconfig")[server_name].setup({
+
+							capabilities = capabilities,
+						})
 					end,
 				},
 			})
@@ -485,6 +494,7 @@ require("lazy").setup({
 	{
 		"nguyenvukhang/nvim-toggler",
 		config = function()
+			-- <leader>i
 			require("nvim-toggler").setup({
 				inverses = {
 					["==="] = "!==",
@@ -666,7 +676,7 @@ require("lazy").setup({
 	{
 		"yetone/avante.nvim",
 		event = "VeryLazy",
-		build = "make",
+		lazy = false,
 		opts = {
 			provider = "azure",
 			azure = {
@@ -680,18 +690,29 @@ require("lazy").setup({
 			},
 			-- add any opts here
 		},
+		build = "make", -- This is optional, recommended tho. Also note that this will block the startup for a bit since we are compiling bindings in Rust.
 		dependencies = {
-			"nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
 			"stevearc/dressing.nvim",
 			"nvim-lua/plenary.nvim",
 			"MunifTanjim/nui.nvim",
-			--- The below is optional, make sure to setup it properly if you have lazy=true
+			--- The below dependencies are optional,
+			"nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
 			{
-				"MeanderingProgrammer/render-markdown.nvim",
+				-- support for image pasting
+				"HakonHarnes/img-clip.nvim",
+				event = "VeryLazy",
 				opts = {
-					file_types = { "markdown", "Avante" },
+					-- recommended settings
+					default = {
+						embed_image_as_base64 = false,
+						prompt_for_file_name = false,
+						drag_and_drop = {
+							insert_mode = true,
+						},
+						-- required for Windows users
+						use_absolute_path = true,
+					},
 				},
-				ft = { "markdown", "Avante" },
 			},
 		},
 	},
