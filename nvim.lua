@@ -677,21 +677,23 @@ require("lazy").setup({
 		"yetone/avante.nvim",
 		event = "VeryLazy",
 		lazy = false,
+		version = false,
 		opts = {
 			provider = "azure",
 			azure = {
 				endpoint = "https://chuanggpt.openai.azure.com",
-				deployment = "gpt4o",
-				api_version = "2024-06-01",
+				deployment = "gpt-4",
+				api_version = "2024-08-01-preview",
 				timeout = 30000,
 				temperature = 0,
-				max_tokens = 4096,
+				max_tokens = 40960,
 				["local"] = false,
 			},
 			-- add any opts here
 		},
 		build = "make", -- This is optional, recommended tho. Also note that this will block the startup for a bit since we are compiling bindings in Rust.
 		dependencies = {
+			"nvim-treesitter/nvim-treesitter",
 			"stevearc/dressing.nvim",
 			"nvim-lua/plenary.nvim",
 			"MunifTanjim/nui.nvim",
@@ -713,6 +715,14 @@ require("lazy").setup({
 						use_absolute_path = true,
 					},
 				},
+			},
+			{
+				-- Make sure to set this up properly if you have lazy=true
+				"MeanderingProgrammer/render-markdown.nvim",
+				opts = {
+					file_types = { "markdown", "Avante" },
+				},
+				ft = { "markdown", "Avante" },
 			},
 		},
 	},
