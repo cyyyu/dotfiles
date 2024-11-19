@@ -682,12 +682,11 @@ require("lazy").setup({
 			provider = "azure",
 			azure = {
 				endpoint = "https://chuanggpt.openai.azure.com",
-				deployment = "gpt-4",
-				api_version = "2024-08-01-preview",
+				deployment = "gpt4o",
+				api_version = "2024-06-01",
 				timeout = 30000,
 				temperature = 0,
-				max_tokens = 40960,
-				["local"] = false,
+				max_tokens = 4096,
 			},
 			-- add any opts here
 		},
