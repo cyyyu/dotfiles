@@ -162,10 +162,15 @@ require("lazy").setup({
 		"folke/tokyonight.nvim",
 		lazy = false,
 		priority = 1000,
-		config = function()
-			vim.cmd("colorscheme tokyonight-night")
-		end,
 	},
+
+	{ "williamboman/mason.nvim" },
+	{ "williamboman/mason-lspconfig.nvim" },
+	{ "neovim/nvim-lspconfig" },
+	{ "hrsh7th/cmp-nvim-lsp" },
+	{ "hrsh7th/nvim-cmp" },
+	{ "jose-elias-alvarez/null-ls.nvim" },
+
 	{
 		"kyazdani42/nvim-tree.lua",
 		lazy = true,
@@ -347,150 +352,7 @@ require("lazy").setup({
 			vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
 		end,
 	},
-	{
-		"williamboman/mason.nvim",
-		config = true,
-	},
-	{
-		"williamboman/mason-lspconfig.nvim",
-		dependencies = {
-			"williamboman/mason.nvim",
-			"neovim/nvim-lspconfig",
-		},
-		config = true,
-	},
 
-	{
-		"VonHeikemen/lsp-zero.nvim",
-		branch = "v3.x",
-		dependencies = {
-			"neovim/nvim-lspconfig",
-			"williamboman/mason-lspconfig.nvim",
-			"williamboman/mason.nvim",
-			"hrsh7th/cmp-nvim-lsp",
-			"hrsh7th/nvim-cmp",
-			"hrsh7th/cmp-buffer",
-			"hrsh7th/cmp-path",
-			"hrsh7th/cmp-cmdline",
-			"hrsh7th/cmp-vsnip",
-			"hrsh7th/vim-vsnip",
-			"L3MON4D3/LuaSnip",
-			"nvimtools/none-ls.nvim",
-		},
-		config = function()
-			local lsp_zero = require("lsp-zero")
-			lsp_zero.on_attach(function(client, bufnr)
-				lsp_zero.default_keymaps({ buffer = bufnr })
-				local opts = { buffer = bufnr, remap = false }
-				vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-				vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-				vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-				vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-				vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-				vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
-				vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
-				vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
-				vim.keymap.set("n", "<leader>si", function()
-					vim.lsp.buf.code_action({ context = { only = { "source.organizeImports" } } })
-				end, opts)
-				vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, opts)
-				vim.api.nvim_set_keymap(
-					"n",
-					"<leader>f",
-					"<cmd>lua vim.lsp.buf.format({ async = true })<CR>",
-					{ noremap = true, silent = true }
-				)
-			end)
-			require("lspconfig").lua_ls.setup(lsp_zero.nvim_lua_ls())
-			lsp_zero.setup()
-
-			require("mason").setup({
-				ui = {
-					icons = {
-						package_installed = "✓",
-						package_pending = "➜",
-						package_uninstalled = "✗",
-					},
-				},
-			})
-
-			require("mason-lspconfig").setup({
-				ensure_installed = { "lua_ls", "ts_ls", "eslint" },
-				automatic_installation = true,
-				handlers = {
-					function(server_name)
-						-- https://github.com/neovim/nvim-lspconfig/pull/3232
-						if server_name == "tsserver" then
-							server_name = "ts_ls"
-						end
-						local capabilities = require("cmp_nvim_lsp").default_capabilities()
-						require("lspconfig")[server_name].setup({
-
-							capabilities = capabilities,
-						})
-					end,
-				},
-			})
-
-			local cmp = require("cmp")
-			local cmp_select = { behavior = cmp.SelectBehavior.select }
-			local cmp_mappings = lsp_zero.defaults.cmp_mappings({
-				["<C-p>"] = cmp.mapping.select_prev_item(cmp_select),
-				["<C-n>"] = cmp.mapping.select_next_item(cmp_select),
-				["<C-Space>"] = cmp.mapping.complete(),
-				["<C-e>"] = cmp.mapping.close(),
-				["<C-l>"] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.insert, select = true }),
-			})
-			cmp_mappings["<Tab>"] = nil
-			cmp_mappings["<S-Tab>"] = nil
-
-			cmp.setup({
-				snippet = {
-					expand = function(args)
-						vim.fn["vsnip#anonymous"](args.body)
-					end,
-				},
-				mapping = cmp_mappings,
-				sources = cmp.config.sources({
-					{ name = "nvim_lsp" },
-					{ name = "vsnip" },
-				}, {
-					{ name = "buffer" },
-				}),
-			})
-
-			cmp.setup.cmdline("/", {
-				mapping = cmp.mapping.preset.cmdline(),
-				sources = { { name = "buffer" } },
-			})
-			cmp.setup.cmdline(":", {
-				mapping = cmp.mapping.preset.cmdline(),
-				sources = cmp.config.sources({
-					{ name = "path" },
-				}, {
-					{ name = "cmdline" },
-				}),
-			})
-
-			local null_ls = require("null-ls")
-			null_ls.setup({
-				sources = {
-					null_ls.builtins.formatting.stylua.with({ filetypes = { "lua" } }),
-					null_ls.builtins.formatting.prettierd.with({
-						filetypes = {
-							"javascript",
-							"typescript",
-							"javascriptreact",
-							"typescriptreact",
-							"html",
-							"css",
-							"scss",
-						},
-					}),
-				},
-			})
-		end,
-	},
 	{
 		"nguyenvukhang/nvim-toggler",
 		config = function()
@@ -518,23 +380,6 @@ require("lazy").setup({
 		config = function()
 			vim.keymap.set("n", "s", "<Plug>(leap-forward)", { noremap = true })
 			vim.keymap.set("n", "S", "<Plug>(leap-backward)", { noremap = true })
-		end,
-	},
-	{
-		"Exafunction/codeium.vim",
-		config = function()
-			vim.keymap.set("i", "<C-j>", function()
-				return vim.fn["codeium#Accept"]()
-			end, { expr = true })
-			vim.keymap.set("i", "<c-;>", function()
-				return vim.fn["codeium#CycleCompletions"](1)
-			end, { expr = true })
-			vim.keymap.set("i", "<c-,>", function()
-				return vim.fn["codeium#CycleCompletions"](-1)
-			end, { expr = true })
-			vim.keymap.set("i", "<c-x>", function()
-				return vim.fn["codeium#Clear"]()
-			end, { expr = true })
 		end,
 	},
 	{ "prisma/vim-prisma" },
@@ -669,8 +514,39 @@ require("lazy").setup({
 			})
 		end,
 	},
+
 	{
 		"Bekaboo/dropbar.nvim",
+	},
+
+	-- {
+	-- "Exafunction/codeium.vim",
+	-- config = function()
+	-- vim.keymap.set("i", "<C-j>", function()
+	-- return vim.fn["codeium#Accept"]()
+	-- end, { expr = true })
+	-- vim.keymap.set("i", "<c-;>", function()
+	-- return vim.fn["codeium#CycleCompletions"](1)
+	-- end, { expr = true })
+	-- vim.keymap.set("i", "<c-,>", function()
+	-- return vim.fn["codeium#CycleCompletions"](-1)
+	-- end, { expr = true })
+	-- vim.keymap.set("i", "<c-x>", function()
+	-- return vim.fn["codeium#Clear"]()
+	-- end, { expr = true })
+	-- end,
+	-- },
+
+	{
+		"github/copilot.vim",
+		config = function()
+			vim.keymap.set("i", "<C-J>", 'copilot#Accept("\\<CR>")', {
+				expr = true,
+				replace_keycodes = false,
+			})
+			vim.g.copilot_no_tab_map = true
+			vim.g.copilot_proxy = "http://127.0.0.1:1082"
+		end,
 	},
 
 	{
@@ -726,3 +602,118 @@ require("lazy").setup({
 		},
 	},
 }, {})
+
+vim.cmd("colorscheme tokyonight-night")
+
+-- LSP
+local lspconfig_defaults = require("lspconfig").util.default_config
+lspconfig_defaults.capabilities =
+	vim.tbl_deep_extend("force", lspconfig_defaults.capabilities, require("cmp_nvim_lsp").default_capabilities())
+vim.api.nvim_create_autocmd("LspAttach", {
+	desc = "LSP actions",
+	callback = function(event)
+		local opts = { buffer = event.buf }
+
+		vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+		vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
+		vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
+		vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+		vim.keymap.set("n", "go", vim.lsp.buf.type_definition, opts)
+		vim.keymap.set("n", "gs", vim.lsp.buf.signature_help, opts)
+		vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+		vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
+		vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
+		vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+		vim.keymap.set("n", "<leader>si", function()
+			vim.lsp.buf.code_action({ context = { only = { "source.organizeImports" } } })
+		end, opts)
+		vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, opts)
+		vim.api.nvim_set_keymap(
+			"n",
+			"<leader>f",
+			"<cmd>lua vim.lsp.buf.format({ async = true })<CR>",
+			{ noremap = true, silent = true }
+		)
+	end,
+})
+require("mason").setup({
+	ui = {
+		icons = {
+			package_installed = "✓",
+			package_pending = "➜",
+			package_uninstalled = "✗",
+		},
+	},
+})
+require("mason-lspconfig").setup({
+	ensure_installed = { "lua_ls", "ts_ls", "eslint" },
+	automatic_installation = true,
+	handlers = {
+		function(server_name)
+			-- https://github.com/neovim/nvim-lspconfig/pull/3232
+			if server_name == "tsserver" then
+				server_name = "ts_ls"
+			end
+			local capabilities = require("cmp_nvim_lsp").default_capabilities()
+			require("lspconfig")[server_name].setup({
+
+				capabilities = capabilities,
+			})
+		end,
+	},
+})
+
+local cmp = require("cmp")
+cmp.setup({
+	snippet = {
+		expand = function(args)
+			vim.fn["vsnip#anonymous"](args.body)
+		end,
+	},
+	mapping = {
+		["<Tab>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.insert }),
+		["<S-Tab>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.insert }),
+		["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.insert }),
+		["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.insert }),
+		["<C-Space>"] = cmp.mapping.complete(),
+		["<C-e>"] = cmp.mapping.close(),
+		["<C-l>"] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.insert, select = true }),
+	},
+	sources = cmp.config.sources({
+		{ name = "nvim_lsp" },
+		{ name = "vsnip" },
+	}, {
+		{ name = "buffer" },
+	}),
+})
+
+cmp.setup.cmdline("/", {
+	mapping = cmp.mapping.preset.cmdline(),
+	sources = { { name = "buffer" } },
+})
+cmp.setup.cmdline(":", {
+	mapping = cmp.mapping.preset.cmdline(),
+	sources = cmp.config.sources({
+		{ name = "path" },
+	}, {
+		{ name = "cmdline" },
+	}),
+})
+
+local null_ls = require("null-ls")
+null_ls.setup({
+	sources = {
+		null_ls.builtins.formatting.stylua.with({ filetypes = { "lua" } }),
+		null_ls.builtins.formatting.prettierd.with({
+			filetypes = {
+				"javascript",
+				"typescript",
+				"javascriptreact",
+				"typescriptreact",
+				"html",
+				"css",
+				"scss",
+			},
+		}),
+	},
+})
