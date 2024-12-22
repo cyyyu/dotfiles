@@ -164,12 +164,149 @@ require("lazy").setup({
 		priority = 1000,
 	},
 
-	{ "williamboman/mason.nvim" },
-	{ "williamboman/mason-lspconfig.nvim" },
-	{ "neovim/nvim-lspconfig" },
-	{ "hrsh7th/cmp-nvim-lsp" },
-	{ "hrsh7th/nvim-cmp" },
-	{ "jose-elias-alvarez/null-ls.nvim" },
+	{
+		"williamboman/mason.nvim",
+		lazy = false,
+		opts = {
+			ui = {
+				icons = {
+					package_installed = "✓",
+					package_pending = "➜",
+					package_uninstalled = "✗",
+				},
+			},
+		},
+	},
+
+	{
+		"hrsh7th/nvim-cmp",
+		event = "InsertEnter",
+		config = function()
+			local cmp = require("cmp")
+			cmp.setup({
+				snippet = {
+					expand = function(args)
+						vim.snippet.expand(args.body)
+					end,
+				},
+				mapping = cmp.mapping.preset.insert({
+					["<Tab>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.insert }),
+					["<S-Tab>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.insert }),
+					["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.insert }),
+					["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.insert }),
+					["<C-Space>"] = cmp.mapping.complete(),
+					["<C-e>"] = cmp.mapping.close(),
+					["<C-l>"] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.insert, select = true }),
+				}),
+				sources = {
+					{ name = "nvim_lsp" },
+					{ name = "vsnip" },
+					{ name = "buffer" },
+				},
+			})
+
+			cmp.setup.cmdline("/", {
+				mapping = cmp.mapping.preset.cmdline(),
+				sources = { { name = "buffer" } },
+			})
+			cmp.setup.cmdline(":", {
+				mapping = cmp.mapping.preset.cmdline(),
+				sources = cmp.config.sources({
+					{ name = "path" },
+				}, {
+					{ name = "cmdline" },
+				}),
+			})
+		end,
+	},
+
+	{
+		"neovim/nvim-lspconfig",
+		cmd = { "LspInfo", "LspInstall", "LspStart" },
+		event = { "BufReadPre", "BufNewFile" },
+		dependencies = {
+			{ "hrsh7th/cmp-nvim-lsp" },
+			{ "williamboman/mason.nvim" },
+			{ "williamboman/mason-lspconfig.nvim" },
+			{ "jose-elias-alvarez/null-ls.nvim" },
+		},
+		init = function()
+			-- Reserve a space in the gutter
+			-- This will avoid an annoying layout shift in the screen
+			vim.opt.signcolumn = "yes"
+		end,
+		config = function()
+			-- LSP
+			local lspconfig_defaults = require("lspconfig").util.default_config
+			lspconfig_defaults.capabilities = vim.tbl_deep_extend(
+				"force",
+				lspconfig_defaults.capabilities,
+				require("cmp_nvim_lsp").default_capabilities()
+			)
+			vim.api.nvim_create_autocmd("LspAttach", {
+				desc = "LSP actions",
+				callback = function(event)
+					local opts = { buffer = event.buf }
+
+					vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+					vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
+					vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
+					vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+					vim.keymap.set("n", "go", vim.lsp.buf.type_definition, opts)
+					vim.keymap.set("n", "gs", vim.lsp.buf.signature_help, opts)
+					vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+					vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
+					vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
+					vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+					vim.keymap.set("n", "<leader>si", function()
+						vim.lsp.buf.code_action({ context = { only = { "source.organizeImports" } } })
+					end, opts)
+					vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, opts)
+					vim.api.nvim_set_keymap(
+						"n",
+						"<leader>f",
+						"<cmd>lua vim.lsp.buf.format({ async = true })<CR>",
+						{ noremap = true, silent = true }
+					)
+				end,
+			})
+
+			local null_ls = require("null-ls")
+			null_ls.setup({
+				sources = {
+					null_ls.builtins.formatting.stylua.with({ filetypes = { "lua" } }),
+					null_ls.builtins.formatting.prettierd.with({
+						filetypes = {
+							"javascript",
+							"typescript",
+							"javascriptreact",
+							"typescriptreact",
+							"html",
+							"css",
+							"scss",
+						},
+					}),
+				},
+			})
+
+			require("mason-lspconfig").setup({
+				ensure_installed = { "lua_ls", "ts_ls", "eslint" },
+				automatic_installation = true,
+				handlers = {
+					function(server_name)
+						-- https://github.com/neovim/nvim-lspconfig/pull/3232
+						if server_name == "tsserver" then
+							server_name = "ts_ls"
+						end
+						local capabilities = require("cmp_nvim_lsp").default_capabilities()
+						require("lspconfig")[server_name].setup({
+							capabilities = capabilities,
+						})
+					end,
+				},
+			})
+		end,
+	},
 
 	{
 		"kyazdani42/nvim-tree.lua",
@@ -604,116 +741,3 @@ require("lazy").setup({
 }, {})
 
 vim.cmd("colorscheme tokyonight-night")
-
--- LSP
-local lspconfig_defaults = require("lspconfig").util.default_config
-lspconfig_defaults.capabilities =
-	vim.tbl_deep_extend("force", lspconfig_defaults.capabilities, require("cmp_nvim_lsp").default_capabilities())
-vim.api.nvim_create_autocmd("LspAttach", {
-	desc = "LSP actions",
-	callback = function(event)
-		local opts = { buffer = event.buf }
-
-		vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-		vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-		vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-		vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-		vim.keymap.set("n", "go", vim.lsp.buf.type_definition, opts)
-		vim.keymap.set("n", "gs", vim.lsp.buf.signature_help, opts)
-		vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-		vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
-		vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
-		vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
-		vim.keymap.set("n", "<leader>si", function()
-			vim.lsp.buf.code_action({ context = { only = { "source.organizeImports" } } })
-		end, opts)
-		vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, opts)
-		vim.api.nvim_set_keymap(
-			"n",
-			"<leader>f",
-			"<cmd>lua vim.lsp.buf.format({ async = true })<CR>",
-			{ noremap = true, silent = true }
-		)
-	end,
-})
-require("mason").setup({
-	ui = {
-		icons = {
-			package_installed = "✓",
-			package_pending = "➜",
-			package_uninstalled = "✗",
-		},
-	},
-})
-require("mason-lspconfig").setup({
-	ensure_installed = { "lua_ls", "ts_ls", "eslint" },
-	automatic_installation = true,
-	handlers = {
-		function(server_name)
-			-- https://github.com/neovim/nvim-lspconfig/pull/3232
-			if server_name == "tsserver" then
-				server_name = "ts_ls"
-			end
-			local capabilities = require("cmp_nvim_lsp").default_capabilities()
-			require("lspconfig")[server_name].setup({
-
-				capabilities = capabilities,
-			})
-		end,
-	},
-})
-
-local cmp = require("cmp")
-cmp.setup({
-	snippet = {
-		expand = function(args)
-			vim.fn["vsnip#anonymous"](args.body)
-		end,
-	},
-	mapping = {
-		["<Tab>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.insert }),
-		["<S-Tab>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.insert }),
-		["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.insert }),
-		["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.insert }),
-		["<C-Space>"] = cmp.mapping.complete(),
-		["<C-e>"] = cmp.mapping.close(),
-		["<C-l>"] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.insert, select = true }),
-	},
-	sources = cmp.config.sources({
-		{ name = "nvim_lsp" },
-		{ name = "vsnip" },
-	}, {
-		{ name = "buffer" },
-	}),
-})
-
-cmp.setup.cmdline("/", {
-	mapping = cmp.mapping.preset.cmdline(),
-	sources = { { name = "buffer" } },
-})
-cmp.setup.cmdline(":", {
-	mapping = cmp.mapping.preset.cmdline(),
-	sources = cmp.config.sources({
-		{ name = "path" },
-	}, {
-		{ name = "cmdline" },
-	}),
-})
-
-local null_ls = require("null-ls")
-null_ls.setup({
-	sources = {
-		null_ls.builtins.formatting.stylua.with({ filetypes = { "lua" } }),
-		null_ls.builtins.formatting.prettierd.with({
-			filetypes = {
-				"javascript",
-				"typescript",
-				"javascriptreact",
-				"typescriptreact",
-				"html",
-				"css",
-				"scss",
-			},
-		}),
-	},
-})
