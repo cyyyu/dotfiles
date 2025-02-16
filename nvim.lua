@@ -764,3 +764,69 @@ require("lazy").setup({
 }, {})
 
 vim.cmd("colorscheme tokyonight-night")
+
+_G.ToggleSmartFold = function()
+  -- Get the current line number
+  local current_line = vim.fn.line(".")
+  -- Get the fold level of the current line
+  local current_fold = vim.fn.foldlevel(current_line)
+
+  if current_fold == 0 then
+    -- If the current line is not part of any fold
+    if vim.fn.getline(current_line):match("^%s*$") then
+      -- If the current line is empty
+      if vim.fn.foldclosedend(".") == vim.fn.line("$") then
+        -- If the end of the fold is the last line of the file, open all folds
+        vim.cmd("normal! zR")
+      else
+        -- Otherwise, close all folds
+        vim.cmd("normal! zM")
+      end
+    else
+      -- If the current line is not empty, toggle the fold at the current line
+      vim.cmd("normal! za")
+    end
+  else
+    -- If the current line is within a fold
+    local fold_start = vim.fn.foldclosed(current_line)
+    if fold_start > 0 then
+      -- If the fold is closed
+      if vim.fn.getline(current_line):match("^%s*$") then
+        -- If the current line is empty, open the fold
+        vim.cmd("normal! zO")
+      else
+        -- If the current line is not empty, find the next fold start and toggle it
+        local next_fold_start = find_next_fold_start(current_line)
+        if next_fold_start > 0 then
+          if next_fold_start <= vim.fn.line("$") then
+            -- If the next fold start is within the file, toggle it
+            vim.cmd(next_fold_start .. "normal! za")
+          else
+            -- Otherwise, toggle the current fold
+            vim.cmd("normal! za")
+          end
+        else
+          -- If there is no next fold, toggle the current fold
+          vim.cmd("normal! za")
+        end
+      end
+    else
+      -- If the fold is open, toggle the current fold
+      vim.cmd("normal! za")
+    end
+  end
+end
+
+-- Custom function to find the next fold start
+_G.find_next_fold_start = function(line)
+  local total_lines = vim.fn.line("$")
+  for i = line + 1, total_lines do
+    if vim.fn.foldlevel(i) > 0 then
+      return i
+    end
+  end
+  return -1
+end
+
+-- Map the function to the "=" key in normal mode
+vim.api.nvim_set_keymap("n", "t", "<cmd>lua ToggleSmartFold()<CR>", { noremap = true, silent = true })
