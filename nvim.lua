@@ -243,7 +243,7 @@ require("lazy").setup({
       { "hrsh7th/cmp-nvim-lsp" },
       { "williamboman/mason.nvim" },
       { "williamboman/mason-lspconfig.nvim" },
-      { "jose-elias-alvarez/null-ls.nvim" },
+      { "mhartington/formatter.nvim" }
     },
     init = function()
       -- Reserve a space in the gutter
@@ -280,28 +280,16 @@ require("lazy").setup({
           vim.api.nvim_set_keymap(
             "n",
             "<leader>f",
-            "<cmd>lua vim.lsp.buf.format({ async = true })<CR>",
+            "<cmd>:Format<CR>",
+            { noremap = true, silent = true }
+          )
+          vim.api.nvim_set_keymap(
+            "n",
+            "<leader>F",
+            "<cmd>:FormatWrite<CR>",
             { noremap = true, silent = true }
           )
         end,
-      })
-
-      local null_ls = require("null-ls")
-      null_ls.setup({
-        sources = {
-          null_ls.builtins.formatting.stylua.with({ filetypes = { "lua" } }),
-          null_ls.builtins.formatting.prettierd.with({
-            filetypes = {
-              "javascript",
-              "typescript",
-              "javascriptreact",
-              "typescriptreact",
-              "html",
-              "css",
-              "scss",
-            },
-          }),
-        },
       })
 
       require("mason-lspconfig").setup({
@@ -712,14 +700,14 @@ require("lazy").setup({
   {
     "yetone/avante.nvim",
     event = "VeryLazy",
-    lazy = false,
+    lazy = true,
     version = false,
     opts = {
       provider = "azure",
       azure = {
-        endpoint = "https://chuanggpt.openai.azure.com",
-        deployment = "gpt4o",
-        api_version = "2024-06-01",
+        endpoint = "https://cyu99-m7vsdpy6-japaneast.cognitiveservices.azure.com",
+        deployment = "gpt-4o",
+        api_version = "2025-01-01-preview",
         timeout = 30000,
         temperature = 0,
         max_tokens = 4096,
@@ -733,7 +721,9 @@ require("lazy").setup({
       "nvim-lua/plenary.nvim",
       "MunifTanjim/nui.nvim",
       --- The below dependencies are optional,
-      "nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
+      "nvim-telescope/telescope.nvim", -- for file_selector provider telescope
+      "hrsh7th/nvim-cmp",              -- autocompletion for avante commands and mentions
+      "nvim-tree/nvim-web-devicons",   -- or echasnovski/mini.icons
       {
         -- support for image pasting
         "HakonHarnes/img-clip.nvim",
@@ -746,8 +736,6 @@ require("lazy").setup({
             drag_and_drop = {
               insert_mode = true,
             },
-            -- required for Windows users
-            use_absolute_path = true,
           },
         },
       },
@@ -830,3 +818,122 @@ end
 
 -- Map the function to the "=" key in normal mode
 vim.api.nvim_set_keymap("n", "t", "<cmd>lua ToggleSmartFold()<CR>", { noremap = true, silent = true })
+
+-- Utilities for creating configurations
+local util = require "formatter.util"
+
+-- Provides the Format, FormatWrite, FormatLock, and FormatWriteLock commands
+require("formatter").setup {
+  -- Enable or disable logging
+  logging = false,
+  -- Set the log level
+  log_level = vim.log.levels.WARN,
+  -- All formatter configurations are opt-in
+  filetype = {
+    -- Formatter configurations for filetype "lua" go here
+    -- and will be executed in order
+    lua = {
+      -- "formatter.filetypes.lua" defines default configurations for the
+      -- "lua" filetype
+      require("formatter.filetypes.lua").stylua,
+
+      -- You can also define your own configuration
+      function()
+        -- Supports conditional formatting
+        if util.get_current_buffer_file_name() == "special.lua" then
+          return nil
+        end
+
+        -- Full specification of configurations is down below and in Vim help
+        -- files
+        return {
+          exe = "stylua",
+          args = {
+            "--search-parent-directories",
+            "--stdin-filepath",
+            util.escape_path(util.get_current_buffer_file_path()),
+            "--",
+            "-",
+          },
+          stdin = true,
+        }
+      end
+    },
+
+
+    javascript = {
+      -- prettierd
+      function()
+        return {
+          exe = "prettierd",
+          args = { vim.api.nvim_buf_get_name(0) },
+          stdin = true
+        }
+      end
+    },
+    typescript = {
+      function()
+        return {
+          exe = "prettierd",
+          args = { vim.api.nvim_buf_get_name(0) },
+          stdin = true
+        }
+      end
+    },
+    typescriptreact = {
+      function()
+        return {
+          exe = "prettierd",
+          args = { vim.api.nvim_buf_get_name(0) },
+          stdin = true
+        }
+      end
+    },
+    javascriptreact = {
+      function()
+        return {
+          exe = "prettierd",
+          args = { vim.api.nvim_buf_get_name(0) },
+          stdin = true
+        }
+      end
+    },
+    json = {
+      function()
+        return {
+          exe = "prettierd",
+          args = { vim.api.nvim_buf_get_name(0) },
+          stdin = true
+        }
+      end
+    },
+    html = {
+      function()
+        return {
+          exe = "prettierd",
+          args = { vim.api.nvim_buf_get_name(0) },
+          stdin = true
+        }
+      end
+    },
+    css = {
+      function()
+        return {
+          exe = "prettierd",
+          args = { vim.api.nvim_buf_get_name(0) },
+          stdin = true
+        }
+      end
+    },
+
+    -- Use the special "*" filetype for defining formatter configurations on
+    -- any filetype
+    ["*"] = {
+      -- "formatter.filetypes.any" defines default configurations for any
+      -- filetype
+      require("formatter.filetypes.any").remove_trailing_whitespace,
+      -- Remove trailing whitespace without 'sed'
+      -- require("formatter.filetypes.any").substitute_trailing_whitespace,
+    }
+  }
+}
