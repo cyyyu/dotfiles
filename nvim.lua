@@ -369,9 +369,16 @@ require("lazy").setup({
     tag = "0.1.8",
     dependencies = {
       "nvim-lua/plenary.nvim",
+      {
+        "nvim-telescope/telescope-live-grep-args.nvim",
+        -- This will not install any breaking changes.
+        -- For major updates, this must be adjusted manually.
+        version = "^1.0.0",
+      },
     },
     config = function()
-      require("telescope").setup({
+      local telescope = require("telescope")
+      telescope.setup({
         {
           defaults = {
             file_ignore_patterns = { "node_modules" },
@@ -404,11 +411,12 @@ require("lazy").setup({
           },
         },
       })
+      telescope.load_extension("live_grep_args")
     end,
 
     vim.keymap.set("n", "<leader>p", "<cmd>Telescope fd theme=get_ivy<cr>"),
     vim.keymap.set("n", "<leader>b", "<cmd>Telescope buffers theme=get_ivy<cr>"),
-    vim.keymap.set("n", "<leader>g", "<cmd>Telescope live_grep theme=get_ivy<cr>"),
+    vim.keymap.set("n", "<leader>g", "<cmd>lua require('telescope').extensions.live_grep_args.live_grep_args()<cr>"),
   },
   {
     "nvim-pack/nvim-spectre",
