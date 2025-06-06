@@ -699,18 +699,20 @@ require("lazy").setup({
   {
     "yetone/avante.nvim",
     event = "VeryLazy",
-    lazy = true,
     version = false,
     opts = {
-      provider = "azure",
-      azure = {
-        endpoint = "https://cyu99-m7vsdpy6-japaneast.cognitiveservices.azure.com",
-        deployment = "gpt-4o",
-        api_version = "2025-01-01-preview",
-        timeout = 30000,
-        temperature = 0,
-        max_tokens = 4096,
-      },
+      providers = {
+        azure = {
+          endpoint = "https://cyu99-m7vsdpy6-japaneast.cognitiveservices.azure.com",
+          deployment = "gpt-4.1",
+          api_version = "2025-01-01-preview",
+          timeout = 30000,
+          max_tokens = 8192,
+          extra_request_body = {
+            temperature = 0,
+          },
+        },
+      }
       -- add any opts here
     },
     build = "make", -- This is optional, recommended tho. Also note that this will block the startup for a bit since we are compiling bindings in Rust.
