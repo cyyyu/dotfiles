@@ -701,6 +701,7 @@ require("lazy").setup({
     event = "VeryLazy",
     version = false,
     opts = {
+      provider = "azure",
       providers = {
         azure = {
           endpoint = "https://cyu99-m7vsdpy6-japaneast.cognitiveservices.azure.com",
@@ -712,8 +713,31 @@ require("lazy").setup({
             temperature = 0,
           },
         },
-      }
+      },
+      selector = {
+        exclude_auto_select = { "NvimTree" },
+      },
       -- add any opts here
+    },
+    keys = {
+      {
+        "<leader>a+",
+        function()
+          local tree_ext = require("avante.extensions.nvim_tree")
+          tree_ext.add_file()
+        end,
+        desc = "Select file in NvimTree",
+        ft = "NvimTree",
+      },
+      {
+        "<leader>a-",
+        function()
+          local tree_ext = require("avante.extensions.nvim_tree")
+          tree_ext.remove_file()
+        end,
+        desc = "Deselect file in NvimTree",
+        ft = "NvimTree",
+      },
     },
     build = "make", -- This is optional, recommended tho. Also note that this will block the startup for a bit since we are compiling bindings in Rust.
     dependencies = {
