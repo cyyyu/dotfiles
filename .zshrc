@@ -7,7 +7,7 @@ export PATH=$HOME/.npm-packages/bin:$HOME/.cargo/bin:$HOME/.local/bin:$HOME/bin:
 export LC_ALL="en_US.UTF-8"
 export LANG=en_US.UTF-8
 
-plugins=(git docker npm jump)
+plugins=(git docker npm jump fzf)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -20,6 +20,7 @@ alias rgf='rg --files | rg'
 alias v=nvim
 alias i='ai -i'
 alias aicommit="ai -p 'I want you to act as a commit message generator. I will provide you with information organized in a custom git status and git diff format. Your task is to generate an appropriate commit message using the conventional git commit format. Reply only with the commit message itself and nothing else.'"
+alias ask="sgpt --model azure/model-router --no-functions $*"
 
 commitall() {
   if [ -n "$1" ]; then
@@ -60,6 +61,10 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # pnpm
 export PNPM_HOME="/Users/chuangyu/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME/bin:"*) ;;
+  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
+esac
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;
