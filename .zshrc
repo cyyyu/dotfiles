@@ -7,12 +7,12 @@ export PATH=$HOME/.npm-packages/bin:$HOME/.cargo/bin:$HOME/.local/bin:$HOME/bin:
 export LC_ALL="en_US.UTF-8"
 export LANG=en_US.UTF-8
 
-plugins=(git docker npm jump fzf)
+plugins=(git docker npm jump fzf history-substring-search)
 
 source $ZSH/oh-my-zsh.sh
 
-bindkey "^P" up-line-or-beginning-search
-bindkey "^N" down-line-or-beginning-search
+bindkey "^P" history-substring-search-up
+bindkey "^N" history-substring-search-down
 
 alias dk=docker
 alias dc=docker-compose
