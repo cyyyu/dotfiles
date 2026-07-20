@@ -10,7 +10,7 @@ declare -a softwares=("zsh" "git" "node" "neovim" "tldr" "tmux" "curl")
 # install homebrew if not exists on mac
 if [ ! -z "$isMac" ] && [ ! -x "$(command -v brew)" ]; then
     echo "Installing homebrew..."
-    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
 for software in "${softwares[@]}"; do

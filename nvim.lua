@@ -366,7 +366,7 @@ require("lazy").setup({
   },
   {
     "nvim-telescope/telescope.nvim",
-    tag = "0.1.8",
+    tag = "*",
     dependencies = {
       "nvim-lua/plenary.nvim",
       {
@@ -384,6 +384,9 @@ require("lazy").setup({
             file_ignore_patterns = { "node_modules" },
             prompt_prefix = " ",
             selection_caret = " ",
+            preview = {
+              treesitter = false,
+            },
             mappings = {
               i = {
                 ["<c-t>"] = function(...)
@@ -479,22 +482,22 @@ require("lazy").setup({
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
-    config = function()
-      require("nvim-treesitter.configs").setup({
-        ensure_installed = {
-          "javascript",
-          "typescript",
-          "lua",
-        },
-        sync_install = false,
-        auto_install = false,
-        highlight = { enable = true },
-        additional_vim_regex_highlighting = false,
-      })
-      vim.opt.foldlevel = 20
-      vim.opt.foldmethod = "expr"
-      vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
-    end,
+    -- config = function()
+    --   require("nvim-treesitter.configs").setup({
+    --     ensure_installed = {
+    --       "javascript",
+    --       "typescript",
+    --       "lua",
+    --     },
+    --     sync_install = false,
+    --     auto_install = false,
+    --     highlight = { enable = true },
+    --     additional_vim_regex_highlighting = false,
+    --   })
+    --   vim.opt.foldlevel = 20
+    --   vim.opt.foldmethod = "expr"
+    --   vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+    -- end,
   },
 
   {
